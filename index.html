@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareGuard — NDIS &amp; Guardianship SaaS CRM (QLD)</title>
+  <meta name="theme-color" content="#312e81" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="CareGuard" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234f46e5'/%3E%3Cpath d='M32 12L16 19v13c0 10.5 6.8 20.3 16 23 9.2-2.7 16-12.5 16-23V19L32 12z' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M25 32l5 5 10-10' fill='none' stroke='%2334d399' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body.easy-read { font-size: 17px; }
+    body.easy-read .text-xs { font-size: 0.875rem !important; }
+    body.easy-read .text-sm { font-size: 1rem !important; }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+    }
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col">
+
+  <!-- Urgent Safety Alert Top Bar -->
+  <div class="bg-gradient-to-r from-rose-700 via-rose-600 to-red-700 text-white px-4 py-2.5 shadow-md">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2 text-xs sm:text-sm">
+      <div class="flex items-start sm:items-center gap-2">
+        <span class="inline-flex h-2.5 w-2.5 rounded-full bg-amber-300 animate-pulse shrink-0 mt-1 sm:mt-0"></span>
+        <span>
+          <strong class="font-bold tracking-wide">URGENT SAFETY PRIORITY:</strong>
+          Wheelchair Seatbelt &amp; Seizure Incident (Family Dinner) — Loose pelvic/chest restraint risk. Immediate OT seating review &amp; NDIS Safeguards action required.
+        </span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 shrink-0">
+        <button id="bannerLogIncidentBtn" class="bg-white text-rose-800 hover:bg-rose-50 font-bold px-3 py-1 rounded-lg text-xs shadow-sm transition cursor-pointer">
+          View / Log Incident
+        </button>
+        <a href="https://www.ndiscommission.gov.au/complaints/report" target="_blank" rel="noopener noreferrer" class="bg-rose-950/60 hover:bg-rose-950 text-white px-3 py-1 rounded-lg text-xs font-semibold inline-flex items-center gap-1 border border-rose-400/30 transition">
+          NDIS Commission Report <i data-lucide="external-link" class="w-3 h-3"></i>
+        </a>
+        <a href="https://www.ndis.gov.au/participants/assistive-technology/assistive-technology-assessments" target="_blank" rel="noopener noreferrer" class="bg-rose-950/60 hover:bg-rose-950 text-white px-3 py-1 rounded-lg text-xs font-semibold inline-flex items-center gap-1 border border-rose-400/30 transition">
+          OT Wheelchair AT <i data-lucide="external-link" class="w-3 h-3"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Obsidian & Indigo Command Header -->
+  <header class="bg-slate-950 text-white border-b border-slate-800 sticky top-0 z-30 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 ring-1 ring-white/20">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white">CareGuard</h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">QLD NDIS CRM</span>
+          </div>
+          <p class="text-xs text-slate-400">Guardianship • Public Trustee • Invoices • Coordinator Sync</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="easyReadToggleBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 cursor-pointer transition" title="Larger text for Mum">
+          <i data-lucide="eye" class="w-3.5 h-3.5 text-teal-400"></i> Easy Read
+        </button>
+        <button id="installAppBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm cursor-pointer transition">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Save / Mobile Guide
+        </button>
+        <button id="editProfileBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 cursor-pointer transition">
+          <i data-lucide="user-cog" class="w-3.5 h-3.5 text-indigo-400"></i> Profile
+        </button>
+        <button id="exportJsonBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 cursor-pointer transition">
+          <i data-lucide="download" class="w-3.5 h-3.5 text-slate-300"></i> Backup
+        </button>
+        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 cursor-pointer transition">
+          <i data-lucide="upload" class="w-3.5 h-3.5 text-slate-300"></i> Restore
+          <input id="importJsonInput" type="file" accept="application/json" class="hidden" />
+        </label>
+        <a href="tel:000" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-sm transition">
+          <i data-lucide="phone-call" class="w-3.5 h-3.5"></i> 000
+        </a>
+      </div>
+    </div>
+
+    <!-- Sleek Pill Navigation -->
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 pb-3 flex items-center gap-1.5 overflow-x-auto scrollbar-thin">
+      <button data-tab="dashboard" class="tab-btn active shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Command Center
+      </button>
+      <button data-tab="invoices" class="tab-btn shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition">
+        <i data-lucide="receipt" class="w-4 h-4"></i> Mum's Invoices
+      </button>
+      <button data-tab="ndisplan" class="tab-btn shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition">
+        <i data-lucide="pie-chart" class="w-4 h-4"></i> NDIS Plan &amp; Budget
+      </button>
+      <button data-tab="sync" class="tab-btn shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition">
+        <i data-lucide="refresh-cw" class="w-4 h-4"></i> Coordinator Sync
+      </button>
+      <button data-tab="directory" class="tab-btn shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition">
+        <i data-lucide="mouse-pointer-click" class="w-4 h-4"></i> 1-Click Hub &amp; Bookmarks
+      </button>
+      <button data-tab="careteam" class="tab-btn shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition">
+        <i data-lucide="users" class="w-4 h-4"></i> Care Team
+      </button>
+      <button data-tab="incidents" class="tab-btn shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i> Incidents &amp; Timer
+      </button>
+      <button data-tab="protocols" class="tab-btn shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition">
+        <i data-lucide="heart-pulse" class="w-4 h-4"></i> Protocols &amp; Meds
+      </button>
+      <button data-tab="settings" class="tab-btn shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition">
+        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i> Settings (On/Off)
+      </button>
+    </nav>
+  </header>
+
+  <!-- Pinned Quick-Launch Bar -->
+  <div class="bg-indigo-950 text-indigo-100 border-b border-indigo-900/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center gap-2 text-xs">
+      <span class="font-bold text-indigo-300 uppercase tracking-wider text-[11px] flex items-center gap-1 mr-1">
+        <i data-lucide="pin" class="w-3 h-3"></i> Pinned 1-Click:
+      </span>
+      <div id="pinnedBar" class="flex flex-wrap items-center gap-1.5"></div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-24 md:pb-8 space-y-6">
+
+    <!-- TAB 1: COMMAND CENTER -->
+    <section id="tab-dashboard" class="tab-panel space-y-6">
+      <!-- Executive Profile Card -->
+      <div class="glass-card rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="space-y-2.5">
+            <div class="flex flex-wrap items-center gap-2">
+              <h2 id="profileNameDisplay" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Mum — Care &amp; Guardianship File</h2>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 border border-indigo-200" id="profileNdisDisplay">NDIS #: Pending Entry</span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">QLD Public Trustee Managed</span>
+            </div>
+            <p class="text-sm text-slate-600" id="profileDetailsDisplay"></p>
+            <div class="flex flex-wrap gap-1.5 pt-1">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">Schizophrenia</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">Functional Neurological Disorder (FND)</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">Dissociative Identity Disorder (DID)</span>
+              <span class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold">Seizure Risk</span>
+              <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold">Wheelchair-Bound (Seatbelt Hazard)</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">Obesity / Bariatric Mobility</span>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 shrink-0">
+            <button id="copyFullBriefBtn" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm cursor-pointer transition">
+              <i data-lucide="copy" class="w-4 h-4"></i> Copy Guardian Summary
+            </button>
+            <button id="quickAddIncidentBtn" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm cursor-pointer transition">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> Log Seizure / Incident
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Bento Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+            <span>NDIS Plan Remaining</span>
+            <span class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600"><i data-lucide="wallet" class="w-4 h-4"></i></span>
+          </div>
+          <div id="kpiRemainingMoney" class="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-2">$0</div>
+          <p id="kpiBudgetSub" class="text-xs text-slate-500 mt-1">$0 spent of $0</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+            <span>Plan Spent (%)</span>
+            <span class="p-1.5 rounded-lg bg-indigo-50 text-indigo-600"><i data-lucide="pie-chart" class="w-4 h-4"></i></span>
+          </div>
+          <div id="kpiBudgetPct" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">0%</div>
+          <p id="kpiActiveCategories" class="text-xs text-slate-500 mt-1">0 active categories</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-rose-200 p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex items-center justify-between text-xs font-semibold text-rose-600">
+            <span>Open Safety Alerts</span>
+            <span class="p-1.5 rounded-lg bg-rose-50 text-rose-600"><i data-lucide="shield-alert" class="w-4 h-4"></i></span>
+          </div>
+          <div id="kpiOpenIncidents" class="text-2xl sm:text-3xl font-extrabold text-rose-600 mt-2">1</div>
+          <p class="text-xs text-slate-500 mt-1">Wheelchair seatbelt &amp; seizure follow-up</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+            <span>Pending Tasks &amp; Invoices</span>
+            <span class="p-1.5 rounded-lg bg-amber-50 text-amber-600"><i data-lucide="receipt" class="w-4 h-4"></i></span>
+          </div>
+          <div id="kpiTasksPending" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">0</div>
+          <p id="kpiInvoicesCount" class="text-xs text-slate-500 mt-1">0 invoices logged</p>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Mum's Plan Expenditure Pie Graph</h3>
+              <p class="text-xs text-slate-500">Money Spent vs. Money Left</p>
+            </div>
+            <button data-jump-tab="ndisplan" class="text-xs font-semibold text-indigo-600 hover:underline cursor-pointer">Edit Budget</button>
+          </div>
+          <div class="relative h-72 w-full">
+            <canvas id="expenditurePieChart"></canvas>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Active NDIS Categories Breakdown</h3>
+              <p class="text-xs text-slate-500">Toggle categories On/Off in Settings</p>
+            </div>
+            <button data-jump-tab="settings" class="text-xs font-semibold text-indigo-600 hover:underline cursor-pointer">Settings (On/Off)</button>
+          </div>
+          <div class="relative h-72 w-full">
+            <canvas id="budgetChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Urgent Action Checklist -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">Urgent Action Plan (Coordination DD &amp; Health Recovery)</h3>
+            <p class="text-xs text-slate-500">Tick off completed steps or add new guardian tasks</p>
+          </div>
+          <form id="addTaskForm" class="flex items-center gap-2">
+            <input id="newTaskInput" type="text" placeholder="Add urgent action..." class="px-3 py-1.5 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-44 sm:w-64" />
+            <button type="submit" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold cursor-pointer">Add</button>
+          </form>
+        </div>
+        <div id="urgentChecklist" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto scrollbar-thin pr-1"></div>
+      </div>
+    </section>
+
+    <!-- TAB 2: MUM'S INVOICES BY DATE -->
+    <section id="tab-invoices" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Mum's NDIS Invoices &amp; Receipts (By Date)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">Every invoice sorted by date, linked to its NDIS funding category and Public Trustee payment status.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="toggleInvoiceSortBtn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 cursor-pointer">
+              <i data-lucide="arrow-up-down" class="w-3.5 h-3.5"></i> Sort: Newest First
+            </button>
+            <button id="openAddInvoiceModalBtn" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm cursor-pointer">
+              <i data-lucide="plus" class="w-4 h-4"></i> Add Invoice
+            </button>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <input id="invSearchInput" type="text" placeholder="Search provider, invoice #, item..." class="px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm" />
+          <select id="invCategoryFilter" class="px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm"></select>
+          <select id="invStatusFilter" class="px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm">
+            <option value="All">All Statuses</option>
+            <option value="Paid">Paid</option>
+            <option value="Pending Public Trustee">Pending Public Trustee</option>
+            <option value="Flagged / Disputed">Flagged / Disputed</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs uppercase">
+              <tr>
+                <th class="py-3 px-4">Date</th>
+                <th class="py-3 px-4">Invoice #</th>
+                <th class="py-3 px-4">Provider &amp; Service</th>
+                <th class="py-3 px-4">NDIS Category</th>
+                <th class="py-3 px-4">Amount</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invoiceTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: NDIS PLAN & BUDGET -->
+    <section id="tab-ndisplan" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Active NDIS Funding Categories &amp; Public Trustee Tracker</h2>
+              <p class="text-xs text-slate-500">Only categories turned ON in Settings appear here. Edit allocations or log invoices to update spent.</p>
+            </div>
+            <button data-jump-tab="settings" class="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-semibold hover:bg-indigo-100 cursor-pointer">
+              Manage On/Off Categories
+            </button>
+          </div>
+          <div id="budgetEditorRows" class="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin pr-1"></div>
+          <div class="pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-sm">
+            <span class="font-semibold text-slate-700">Total Active NDIS Plan Remaining:</span>
+            <span id="budgetRemainingTotal" class="text-lg font-bold text-emerald-700">$0</span>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 space-y-6">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-900 mb-2">Total Spent vs. Remaining</h3>
+            <div class="relative h-64 w-full">
+              <canvas id="planTabPieChart"></canvas>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="text-sm font-bold text-slate-900">Coordination DD Plan Reassessment Brief</h2>
+              <button id="copyDdAgendaBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold cursor-pointer">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Brief
+              </button>
+            </div>
+            <textarea id="ddAgendaTextarea" rows="8" class="w-full rounded-xl border border-slate-300 p-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: UNIVERSAL COORDINATOR SYNC HUB -->
+    <section id="tab-sync" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-2">
+        <h2 class="text-lg font-bold text-slate-900">Universal Coordinator &amp; Plan Manager Sync Hub</h2>
+        <p class="text-xs sm:text-sm text-slate-600">
+          Works with <strong>any</strong> Support Coordinator or Plan Manager system (SupportAbility, Careview, ShiftCare, Brevity, Lumary, Xero, Excel, or Google Sheets).
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="send" class="w-4 h-4 text-indigo-600"></i> 1-Click Connect &amp; Export to Coordinator
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button id="exportCsvBtn" class="py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export Universal CSV
+            </button>
+            <button id="copyCoordinatorInviteBtn" class="py-2.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer">
+              <i data-lucide="mail" class="w-4 h-4"></i> Copy Coordinator Sync Email
+            </button>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+            <p class="font-semibold text-slate-800">How Coordinators Sync With CareGuard:</p>
+            <p>1. Send the <strong>Coordinator Sync Email</strong> to Coordination DD or your Plan Manager.</p>
+            <p>2. They reply with a CSV export from their CRM (or copy-paste rows from their spreadsheet).</p>
+            <p>3. Upload or paste it on the right — CareGuard maps dates, providers, amounts, and categories automatically.</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="upload-cloud" class="w-4 h-4 text-emerald-600"></i> Import CSV or Paste From Any Coordinator System
+          </h3>
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold cursor-pointer">
+              <i data-lucide="file-up" class="w-4 h-4"></i> Upload Any NDIS CSV File
+              <input id="importCsvInput" type="file" accept=".csv,text/csv" class="hidden" />
+            </label>
+            <span class="text-xs text-slate-500">Supports Date, Invoice#, Provider, Category, Amount, Status</span>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-xs font-semibold text-slate-700">Or Paste Rows Directly (from Excel, Google Sheets, or Email):</label>
+            <textarea id="pasteSyncTextarea" rows="4" placeholder="2026-11-22, INV-904, Brisbane OT Mobility, Assistive Technology, 480.00, Pending Public Trustee" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-mono"></textarea>
+            <button id="runPasteSyncBtn" class="w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold cursor-pointer">
+              1-Click Parse &amp; Sync Pasted Rows
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+        <h3 class="text-sm font-bold text-slate-900">Coordinator Sync Audit Log</h3>
+        <div id="syncLogList" class="space-y-2 max-h-48 overflow-y-auto scrollbar-thin"></div>
+      </div>
+    </section>
+
+    <!-- TAB 5: 1-CLICK NDIS HUB & MUM'S BOOKMARKED CATALOGUE -->
+    <section id="tab-directory" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">1-Click NDIS Registered Providers &amp; Mum's Catalogue</h2>
+            <p class="text-xs sm:text-sm text-slate-500">Find verified QLD &amp; NDIS supports below and click <strong>★ Bookmark</strong> to save them into Mum's special catalogue categories.</p>
+          </div>
+          <div class="relative w-full md:w-72">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+            <input id="dirSearchInput" type="text" placeholder="Search services, conditions, phone..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+        </div>
+        <div id="dirCategoryFilters" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- Mum's Bookmarked Supports Catalogue -->
+      <div class="bg-gradient-to-br from-amber-50 to-orange-50/70 rounded-2xl border border-amber-200 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-amber-950 flex items-center gap-2">
+              <i data-lucide="bookmark-check" class="w-5 h-5 text-amber-600"></i> Mum's Bookmarked Supports Catalogue
+            </h3>
+            <p class="text-xs text-amber-900/80">Your saved supports organised into your own easy-to-find catalogue categories.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="catalogueCatFilter" class="px-3 py-1.5 rounded-xl border border-amber-300 bg-white text-xs font-semibold text-slate-800"></select>
+            <button id="openAddCustomSupportBtn" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add My Own Support
+            </button>
+          </div>
+        </div>
+        <div id="bookmarkedCatalogueGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+      </div>
+
+      <div id="directoryGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- TAB 6: CARE TEAM CRM -->
+    <section id="tab-careteam" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Active Care Team &amp; Provider CRM</h2>
+          <p class="text-xs sm:text-sm text-slate-500">Manage Support Coordination (DD), Public Trustee, OT, Neurologist, Psychiatrist, and Dietitian contacts &amp; call logs.</p>
+        </div>
+        <button id="openAddProviderModalBtn" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm cursor-pointer shrink-0">
+          <i data-lucide="user-plus" class="w-4 h-4"></i> Add Care Provider
+        </button>
+      </div>
+      <div id="careTeamGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-slate-900">Communication &amp; Call Log</h3>
+          <span class="text-xs text-slate-500">Records every call, email, or referral note</span>
+        </div>
+        <div id="interactionLogList" class="space-y-2 max-h-64 overflow-y-auto scrollbar-thin"></div>
+      </div>
+    </section>
+
+    <!-- TAB 7: INCIDENT & SEIZURE LOG -->
+    <section id="tab-incidents" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-5 space-y-6">
+          <div class="bg-gradient-to-br from-rose-950 to-slate-950 text-white rounded-2xl p-5 shadow-md space-y-3 border border-rose-800/50">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold flex items-center gap-2">
+                <i data-lucide="timer" class="w-4 h-4 text-rose-400"></i> Live Seizure / FND Episode Timer
+              </h3>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-rose-800 text-rose-100 font-semibold">5:00 = Call 000</span>
+            </div>
+            <div id="seizureTimerDisplay" class="text-4xl font-mono font-bold tracking-wider text-center py-2">00:00</div>
+            <div class="flex items-center justify-center gap-2">
+              <button id="timerStartBtn" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold cursor-pointer">Start</button>
+              <button id="timerStopBtn" class="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-xs font-semibold cursor-pointer">Stop</button>
+              <button id="timerResetBtn" class="px-3.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-semibold cursor-pointer">Reset</button>
+              <button id="timerSaveBtn" class="px-3.5 py-1.5 rounded-lg bg-white text-rose-900 hover:bg-rose-50 text-xs font-bold cursor-pointer">Log Episode</button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+            <h2 class="text-base font-bold text-slate-900">Log Seizure, Wheelchair Safety, or Care Incident</h2>
+            <form id="incidentForm" class="space-y-3 text-sm">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Incident Title</label>
+                <input id="incTitle" type="text" required placeholder="e.g. Seizure during outing / loose seatbelt" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm" />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Category</label>
+                  <select id="incType" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm">
+                    <option value="Seizure + Equipment Hazard">Seizure + Equipment Hazard</option>
+                    <option value="Seizure / FND Episode">Seizure / FND Episode</option>
+                    <option value="Wheelchair / Mobility Safety">Wheelchair / Mobility Safety</option>
+                    <option value="Mental Health / DID / Schizophrenia">Mental Health / DID / Schizophrenia</option>
+                    <option value="Provider / Care Quality Issue">Provider / Care Quality Issue</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Severity</label>
+                  <select id="incSeverity" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm">
+                    <option value="Critical">Critical (Immediate Action)</option>
+                    <option value="High">High</option>
+                    <option value="Moderate">Moderate</option>
+                    <option value="Low">Low / Observation</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Date &amp; Time</label>
+                <input id="incDate" type="datetime-local" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Details, Triggers &amp; Equipment Involved</label>
+                <textarea id="incDetails" rows="3" required placeholder="Describe what happened, duration, wheelchair seatbelt fit, injuries..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Action Taken / Escalation</label>
+                <input id="incAction" type="text" placeholder="e.g. Reported to Support Coordinator DD &amp; OT" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm" />
+              </div>
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold cursor-pointer transition">
+                Save Incident to Guardianship Record
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold text-slate-900">Recorded Incidents &amp; Safeguards Follow-Up</h2>
+            <span class="text-xs text-slate-500">Use Copy Report for NDIS Commission / OT</span>
+          </div>
+          <div id="incidentList" class="space-y-3 max-h-[680px] overflow-y-auto scrollbar-thin pr-1"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 8: CARE PROTOCOLS & MEDS -->
+    <section id="tab-protocols" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-rose-50 border border-rose-200 rounded-2xl p-5 space-y-2">
+          <h3 class="text-sm font-bold text-rose-900 flex items-center gap-2">
+            <i data-lucide="accessibility" class="w-4 h-4"></i> Wheelchair &amp; Seizure Safety Protocol
+          </h3>
+          <ul class="text-xs text-rose-950 space-y-1.5 list-disc pl-4 leading-relaxed">
+            <li><strong>Pre-Outing Seatbelt Check:</strong> Verify pelvic lap belt is snug (two-finger gap max) and chest/thoracic harness is secured before any transport or dining outing.</li>
+            <li><strong>During a Seizure in Wheelchair:</strong> Lock wheelchair brakes immediately, keep seatbelt fastened to prevent falling forward, cushion head, time the seizure, and do not restrain limbs.</li>
+            <li><strong>Call 000 Immediately If:</strong> Seizure lasts &gt;5 minutes, breathing difficulty occurs, head injury/fall happens, or repeated seizures occur.</li>
+          </ul>
+        </div>
+        <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 space-y-2">
+          <h3 class="text-sm font-bold text-indigo-900 flex items-center gap-2">
+            <i data-lucide="brain" class="w-4 h-4"></i> FND, Schizophrenia &amp; DID Care Notes
+          </h3>
+          <ul class="text-xs text-indigo-950 space-y-1.5 list-disc pl-4 leading-relaxed">
+            <li><strong>Calm Environment:</strong> Reduce sensory overload (bright lights, loud noise) when FND functional seizures or dissociative switches occur.</li>
+            <li><strong>Consistent Grounding:</strong> Speak calmly, use simple grounding statements ("You are safe, we are with family"), and avoid arguing with distressing beliefs.</li>
+            <li><strong>QLD 24/7 Crisis Line:</strong> Call <strong>1300 MH CALL (1300 642 255)</strong> for mental health triage.</li>
+          </ul>
+        </div>
+        <div class="bg-teal-50 border border-teal-200 rounded-2xl p-5 space-y-2">
+          <h3 class="text-sm font-bold text-teal-900 flex items-center gap-2">
+            <i data-lucide="heart-handshake" class="w-4 h-4"></i> Weight, Mobility &amp; Health Recovery
+          </h3>
+          <ul class="text-xs text-teal-950 space-y-1.5 list-disc pl-4 leading-relaxed">
+            <li><strong>NDIS Dietitian &amp; Exercise Physiology:</strong> Use Capacity Building — Improved Health &amp; Wellbeing funding for wheelchair-adapted nutrition and gentle movement.</li>
+            <li><strong>Pressure Care &amp; Transfers:</strong> Review bariatric wheelchair cushion &amp; hoist/transfer plan with Physiotherapist and OT.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Daily Medication &amp; Blister-Pack Check-Off</h2>
+            <p class="text-xs text-slate-500">Track daily doses for Schizophrenia, Seizures, and general health</p>
+          </div>
+          <button id="resetMedsTodayBtn" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 cursor-pointer">Reset for New Day</button>
+        </div>
+        <div id="medsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Medical Appointments &amp; Care Schedule</h2>
+            <p class="text-xs text-slate-500">Track upcoming specialist reviews (OT, Neurologist, Psychiatrist, Support Coordination DD)</p>
+          </div>
+          <form id="addApptForm" class="flex flex-wrap items-center gap-2">
+            <input id="apptTitle" type="text" required placeholder="Appointment / Task..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs" />
+            <input id="apptDate" type="date" required class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs" />
+            <button type="submit" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold cursor-pointer">Add</button>
+          </form>
+        </div>
+        <div id="apptList" class="divide-y divide-slate-100"></div>
+      </div>
+    </section>
+
+    <!-- TAB 9: SETTINGS (ALL 21 NDIS FUNDING CATEGORIES ON/OFF) -->
+    <section id="tab-settings" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">NDIS Funding Categories Settings (On / Off Switches)</h2>
+          <p class="text-xs sm:text-sm text-slate-500">Turn ON only the NDIS categories included in Mum's plan (e.g., Stays/Respite, Consumables, Support Coordination, Assistive Technology).</p>
+        </div>
+        <div class="flex gap-2 shrink-0">
+          <button id="enableAllCatsBtn" class="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-semibold hover:bg-indigo-100 cursor-pointer">Turn All On</button>
+          <button id="resetDefaultCatsBtn" class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 cursor-pointer">Mum's Recommended Defaults</button>
+        </div>
+      </div>
+      <div id="settingsCategoriesContainer" class="space-y-6"></div>
+    </section>
+
+  </main>
+
+  <!-- Mobile Bottom App Navigation -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-40 px-2 py-1.5 flex items-center justify-around shadow-lg">
+    <button data-tab="dashboard" class="mobile-tab-btn flex flex-col items-center gap-0.5 text-[10px] font-semibold text-indigo-600 cursor-pointer px-2 py-1">
+      <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Home
+    </button>
+    <button data-tab="invoices" class="mobile-tab-btn flex flex-col items-center gap-0.5 text-[10px] font-medium text-slate-500 cursor-pointer px-2 py-1">
+      <i data-lucide="receipt" class="w-4 h-4"></i> Invoices
+    </button>
+    <button data-tab="directory" class="mobile-tab-btn flex flex-col items-center gap-0.5 text-[10px] font-medium text-slate-500 cursor-pointer px-2 py-1">
+      <i data-lucide="mouse-pointer-click" class="w-4 h-4"></i> 1-Click Hub
+    </button>
+    <button data-tab="sync" class="mobile-tab-btn flex flex-col items-center gap-0.5 text-[10px] font-medium text-slate-500 cursor-pointer px-2 py-1">
+      <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sync
+    </button>
+    <button data-tab="settings" class="mobile-tab-btn flex flex-col items-center gap-0.5 text-[10px] font-medium text-slate-500 cursor-pointer px-2 py-1">
+      <i data-lucide="sliders-horizontal" class="w-4 h-4"></i> Settings
+    </button>
+  </nav>
+
+  <!-- Bookmark Modal -->
+  <div id="bookmarkModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Bookmark to Mum's Catalogue</h3>
+        <button id="closeBookmarkModalBtn" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="bookmarkForm" class="space-y-3 text-sm">
+        <input id="bmServiceId" type="hidden" />
+        <p id="bmServiceName" class="text-xs font-semibold text-indigo-700 bg-indigo-50 px-3 py-2 rounded-lg"></p>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Choose Catalogue Category</label>
+          <select id="bmCategorySelect" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Or Create a New Catalogue Category</label>
+          <input id="bmNewCategory" type="text" placeholder="e.g. My Favourite Support Workers" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Personal Note for Mum (Optional)</label>
+          <input id="bmNote" type="text" placeholder="e.g. Ask for Sarah on Tuesdays" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="cancelBookmarkModalBtn" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold cursor-pointer">Save Bookmark</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Custom Support Modal -->
+  <div id="customSupportModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Add Support to Mum's Catalogue</h3>
+        <button id="closeCustomSupportBtn" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="customSupportForm" class="space-y-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Support / Service Name</label>
+          <input id="csName" type="text" required placeholder="e.g. Jenny (Support Worker) or Local OT" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Catalogue Category</label>
+          <select id="csCategory" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Phone</label>
+            <input id="csPhone" type="text" placeholder="04XX XXX XXX" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Website (Optional)</label>
+            <input id="csUrl" type="url" placeholder="https://..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Helpful Note</label>
+          <input id="csDesc" type="text" placeholder="e.g. Helps with Wednesday shopping &amp; dinner outings" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="cancelCustomSupportBtn" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold cursor-pointer">Save to Catalogue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Invoice Modal -->
+  <div id="invoiceModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Add NDIS Invoice</h3>
+        <button id="closeInvoiceModalBtn" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="invoiceForm" class="space-y-3 text-sm">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Invoice Date</label>
+            <input id="invDate" type="date" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Invoice Number</label>
+            <input id="invNumber" type="text" required placeholder="e.g. INV-2026-104" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Provider Name</label>
+          <input id="invProvider" type="text" required placeholder="e.g. Brisbane Wheelchair &amp; Seating OT" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">NDIS Funding Category</label>
+          <select id="invCategory" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Amount ($ AUD)</label>
+            <input id="invAmount" type="number" step="0.01" min="0" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Status</label>
+            <select id="invStatus" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
+              <option value="Pending Public Trustee">Pending Public Trustee</option>
+              <option value="Paid">Paid</option>
+              <option value="Flagged / Disputed">Flagged / Disputed</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Description / Line Items</label>
+          <input id="invDesc" type="text" placeholder="e.g. Continence consumables / OT wheelchair review" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="cancelInvoiceModalBtn" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold cursor-pointer">Save Invoice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Invoice Detail Modal -->
+  <div id="invoiceDetailModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Invoice Receipt Details</h3>
+        <button id="closeInvDetailBtn" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div id="invDetailBody" class="space-y-2 text-xs sm:text-sm text-slate-700"></div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button id="copyInvDetailBtn" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold cursor-pointer">Copy Receipt</button>
+        <button id="closeInvDetailBtn2" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 cursor-pointer">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save / Mobile Guide Modal -->
+  <div id="installModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center">
+            <i data-lucide="smartphone" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Save CareGuard on Phone or Computer</h3>
+            <p class="text-xs text-slate-500">Works offline from your device</p>
+          </div>
+        </div>
+        <button id="closeInstallModalBtn" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="space-y-3 text-xs text-slate-700 leading-relaxed">
+        <div class="p-3 rounded-xl bg-indigo-50 border border-indigo-200 space-y-1.5">
+          <p class="font-bold text-indigo-950">How to Open Locally (No Server Needed):</p>
+          <p>Download <strong>careguard_ndis_crm_code.zip</strong> from chat, unzip it, and double-click <code>careguard_ndis_crm.html</code> in Chrome, Safari, or Edge.</p>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <p class="font-bold text-slate-900">Pin to Phone Home Screen:</p>
+          <p><strong>iPhone / iPad (Safari):</strong> Tap <strong>Share</strong> → <strong>Add to Home Screen</strong>.</p>
+          <p><strong>Android (Chrome):</strong> Tap the <strong>3-dot menu</strong> → <strong>Add to Home screen</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div id="profileModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Edit Mum's Guardianship &amp; NDIS Profile</h3>
+        <button id="closeProfileModalBtn" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="profileForm" class="space-y-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Participant Name / Label</label>
+          <input id="pfName" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">NDIS Participant Number</label>
+            <input id="pfNdis" type="text" placeholder="e.g. 430 XXX XXX" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Plan Review Date</label>
+            <input id="pfReviewDate" type="date" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Support Coordinator (DD) Name</label>
+            <input id="pfCoordinator" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Public Trustee Case Officer</label>
+            <input id="pfTrustee" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="cancelProfileModalBtn" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold cursor-pointer">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Provider Modal -->
+  <div id="providerModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Add Provider to Care Team CRM</h3>
+        <button id="closeProviderModalBtn" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="providerForm" class="space-y-3 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Provider / Organisation Name</label>
+            <input id="prName" type="text" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Role / Specialty</label>
+            <input id="prRole" type="text" required placeholder="e.g. Occupational Therapist" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Phone</label>
+            <input id="prPhone" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Email</label>
+            <input id="prEmail" type="email" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Website URL (Optional)</label>
+            <input id="prUrl" type="url" placeholder="https://..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Status</label>
+            <select id="prStatus" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
+              <option value="Urgent Review">Urgent Review</option>
+              <option value="Active">Active</option>
+              <option value="Referral Pending">Referral Pending</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="cancelProviderModalBtn" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold cursor-pointer">Add Provider</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Log Interaction Modal -->
+  <div id="logModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 id="logModalTitle" class="text-base font-bold text-slate-900">Log Contact Interaction</h3>
+        <button id="closeLogModalBtn" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="logInteractionForm" class="space-y-3">
+        <input id="logProviderName" type="hidden" />
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Channel</label>
+          <select id="logChannel" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
+            <option value="Phone Call">Phone Call</option>
+            <option value="Email">Email</option>
+            <option value="Portal / Referral">Portal / Referral</option>
+            <option value="In-Person Meeting">In-Person Meeting</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Summary / Outcome</label>
+          <textarea id="logSummary" rows="3" required placeholder="Who you spoke with, reference number, next steps..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"></textarea>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button type="button" id="cancelLogModalBtn" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold cursor-pointer">Save Log</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-16 md:bottom-5 right-5 bg-slate-900 text-white text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg hidden items-center gap-2 z-50">
+    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toastMsg">Saved</span>
+  </div>
+
+  <script>
+    const VERIFIED_SERVICES = [
+      { id: 'ndis-commission-report', name: 'NDIS Quality & Safeguards Commission — Report Issue', category: 'Safeguards & Incident Reporting', badge: 'Urgent Safety', url: 'https://www.ndiscommission.gov.au/complaints/report', phone: '1800 035 544', email: '', desc: 'Report unsafe wheelchair equipment, loose seatbelt hazards, or NDIS provider quality/safety concerns.' },
+      { id: 'ndis-reportable-incidents', name: 'NDIS Commission — Reportable Incidents Guidance', category: 'Safeguards & Incident Reporting', badge: 'Official Guide', url: 'https://www.ndiscommission.gov.au/rules-and-standards/reportable-incidents-and-incident-management/reportable-incidents', phone: '1800 035 544', email: '', desc: 'Rules and timelines for registered providers to report serious incidents and injuries.' },
+      { id: 'ndis-at-assessment', name: 'NDIS Assistive Technology (Wheelchair & Seating)', category: 'NDIS Plan & Equipment', badge: 'Wheelchair AT', url: 'https://www.ndis.gov.au/participants/assistive-technology/assistive-technology-assessments', phone: '1800 800 110', email: 'enquiries@ndis.gov.au', desc: 'Official NDIS process for Occupational Therapy assessments, bariatric wheelchairs, and safety harnesses.' },
+      { id: 'ndis-plan-reassessment', name: 'NDIS Plan Reassessment (Change of Situation)', category: 'NDIS Plan & Equipment', badge: 'Plan Review', url: 'https://www.ndis.gov.au/participants/changing-your-plan/types-plan-changes/what-plan-reassessment', phone: '1800 800 110', email: '', desc: 'Request an urgent NDIS plan review when health, seizure frequency, or mobility needs change.' },
+      { id: 'ndis-change-plan-how', name: 'NDIS — How to Ask for a Plan Change', category: 'NDIS Plan & Equipment', badge: 'Official Steps', url: 'https://www.ndis.gov.au/participants/changing-your-plan/ways-change-your-plan/how-ask-change-your-plan', phone: '1800 800 110', email: '', desc: 'Step-by-step instructions and forms to submit medical/OT evidence for a plan update.' },
+      { id: 'ndis-provider-finder', name: 'NDIS Official Provider Finder', category: 'NDIS Plan & Equipment', badge: 'Registered Only', url: 'https://www.ndis.gov.au/participants/working-providers/finding-providers/provider-finder', phone: '1800 800 110', email: '', desc: 'Search official NDIA-registered providers in Brisbane by registration group and suburb.' },
+      { id: 'ndis-commission-register', name: 'NDIS Commission Registered Provider Register', category: 'NDIS Plan & Equipment', badge: 'Verify Provider', url: 'https://www.ndiscommission.gov.au/provider-registration/find-registered-provider', phone: '1800 035 544', email: '', desc: 'Verify whether any disability provider or support coordinator holds active NDIS registration.' },
+      { id: 'ndis-participant-portal', name: 'my NDIS / myplace Participant Portal Guide', category: 'NDIS Plan & Equipment', badge: 'Portal Login', url: 'https://www.ndis.gov.au/participants/using-your-funding/using-portal-and-app/how-use-participant-portals', phone: '1800 800 110', email: '', desc: "Access Mum's NDIS plan budgets, claims, and provider bookings via myGov." },
+      { id: 'qld-public-trustee', name: 'Queensland Public Trustee (Financial Admin)', category: 'Guardianship & Public Trust (QLD)', badge: 'Public Trust', url: 'https://www.pt.qld.gov.au/financial-administration', phone: '1300 360 044', email: 'clientenq@pt.qld.gov.au', desc: 'Financial administration for adults with impaired decision-making capacity in Queensland.' },
+      { id: 'qld-opg', name: 'Office of the Public Guardian (OPG) Queensland', category: 'Guardianship & Public Trust (QLD)', badge: 'Guardianship', url: 'https://www.publicguardian.qld.gov.au/', phone: '1300 653 187', email: '', desc: 'QLD guardianship advocacy, healthcare consent, and protecting rights of vulnerable adults (50 Ann St, Brisbane).' },
+      { id: 'qdn-brisbane', name: 'Queenslanders with Disability Network (QDN)', category: 'Guardianship & Public Trust (QLD)', badge: 'Brisbane Advocacy', url: 'https://www.localsearch.com.au/find/ndis-support-coordination/brisbane-city-qld-4000', phone: '1300 363 783', email: '', desc: 'Peer advocacy and disability support network located at 338 Turbot St, Spring Hill QLD.' },
+      { id: 'ndis-sc-guide', name: 'NDIS — How to Find a Support Coordinator', category: 'Support Coordination (DD) — Brisbane', badge: 'Official Guide', url: 'https://www.ndis.gov.au/participants/working-providers/support-coordinators-and-plan-managers/how-find-support-coordinator', phone: '1800 800 110', email: '', desc: 'Understand Level 2 Support Coordination & Level 3 Specialist Support Coordination for complex needs.' },
+      { id: 'stjudes-brisbane', name: "St Jude's NDIS Support Coordination Brisbane", category: 'Support Coordination (DD) — Brisbane', badge: 'Brisbane Provider', url: 'https://stjudes.com.au/disability-services/qld/support-coordination-brisbane', phone: '', email: '', desc: 'Brisbane-based NDIS Support Coordination team assisting with plan reviews and provider setup.' },
+      { id: 'tibii-brisbane', name: 'Tibii NDIS Support Coordination (Banyo / Brisbane)', category: 'Support Coordination (DD) — Brisbane', badge: 'Brisbane Provider', url: 'https://tibii-qld.com.au/locations/brisbane/support-coordination', phone: '', email: '', desc: 'Helps participants understand NDIS plans, connect providers, and prepare for plan reviews.' },
+      { id: 'onside-brisbane', name: 'OnSide NDIS Support Coordination (Eight Mile Plains)', category: 'Support Coordination (DD) — Brisbane', badge: 'Brisbane Provider', url: 'https://www.onside.com.au/contact-us/ndis-support-coordination-brisbane/', phone: '', email: '', desc: 'Independent NDIS Support Coordination in Brisbane (Suite 8, 88 Brandl St, Eight Mile Plains).' },
+      { id: 'clickability-ndis', name: 'Clickability — NDIS Provider Comparison Directory', category: 'Support Coordination (DD) — Brisbane', badge: 'Directory', url: 'https://ndis.clickability.com.au/', phone: '', email: '', desc: 'Compare reviewed NDIS OTs, support workers, dietitians, and support coordinators in Brisbane.' },
+      { id: 'ndis-provider-finder-net', name: 'NDIS Provider Finder Net (Search by Suburb)', category: 'Support Coordination (DD) — Brisbane', badge: 'Directory', url: 'https://ndisproviderfinder.net.au/', phone: '', email: '', desc: 'Search 6,500+ NDIS providers by suburb, service category, and specialisation.' },
+      { id: 'epilepsy-qld', name: 'Epilepsy Queensland (Woolloongabba, Brisbane)', category: 'Seizures, FND & Neurology', badge: 'Seizure Support', url: 'https://epilepsyqueensland.com.au/', phone: '1300 852 853', email: 'livingwell@epilepsyqueensland.com.au', desc: 'Seizure management plans, Living Well team, and Midazolam/seizure training in Brisbane.' },
+      { id: 'fnd-aus', name: 'FND Australia Support Services', category: 'Seizures, FND & Neurology', badge: 'FND Specialist', url: 'https://fndaus.org.au/', phone: '', email: '', desc: 'National charity dedicated to Functional Neurological Disorder education and care pathways.' },
+      { id: 'fnd-professionals', name: 'FND Australia — Health Professionals Directory', category: 'Seizures, FND & Neurology', badge: 'Find FND Clinician', url: 'https://fndaus.org.au/fnd-health-professionals/', phone: '', email: '', desc: 'Find neurologists, physiotherapists, and psychologists experienced with FND.' },
+      { id: 'qld-mh-call', name: 'QLD Health 1300 MH CALL (24/7 Mental Health Triage)', category: 'Mental Health (Schizophrenia & DID)', badge: '24/7 Triage', url: 'https://www.qld.gov.au/health/mental-health-and-wellbeing/how-to-get-help/1300-mh-call', phone: '1300 642 255', email: '', desc: 'Confidential 24/7 first point of contact for Queensland Health public mental health services.' },
+      { id: 'metro-north-mh', name: 'Metro North Health — Mental Health Services', category: 'Mental Health (Schizophrenia & DID)', badge: 'North Brisbane', url: 'https://metronorth.health.qld.gov.au/hospitals-services/mental-health-services', phone: '1300 642 255', email: '', desc: 'Specialist assessment, treatment, and recovery services across North Brisbane (incl. RBWH).' },
+      { id: 'metro-south-mh', name: 'Metro South Health — Mental Health Services', category: 'Mental Health (Schizophrenia & DID)', badge: 'South Brisbane', url: 'https://www.metrosouth.health.qld.gov.au/services/mental-health', phone: '1300 642 255', email: '', desc: 'Community & hospital mental health services for South Brisbane, Logan, and Redlands.' },
+      { id: 'sane-referral', name: 'SANE Australia — Complex Mental Health eReferral', category: 'Mental Health (Schizophrenia & DID)', badge: 'Schizophrenia / DID', url: 'https://portal.sane.org/s/referral', phone: '', email: 'info@sane.org', desc: 'Free digital & peer support programs for complex mental health including schizophrenia.' }
+    ];
+
+    const ALL_NDIS_CATEGORIES = [
+      { id: 'core_daily', group: 'Core Supports (Flexible)', name: 'Assistance with Daily Life', desc: 'Personal care, cooking, cleaning, and daily support workers.', allocated: 48000, enabled: true },
+      { id: 'core_consumables', group: 'Core Supports (Flexible)', name: 'Consumables', desc: 'Continence products, everyday disability items, low-cost AT (<$1,500).', allocated: 3500, enabled: true },
+      { id: 'core_social', group: 'Core Supports (Flexible)', name: 'Assistance with Social & Community Participation', desc: 'Support workers for outings, family dinners, and community access.', allocated: 14000, enabled: true },
+      { id: 'core_transport', group: 'Core Supports (Flexible)', name: 'Transport (Core)', desc: 'Wheelchair-accessible taxi / community transport funding.', allocated: 2800, enabled: true },
+      { id: 'core_sta', group: 'Core Supports (Flexible)', name: 'Short Term Accommodation (STA / Stays & Respite)', desc: 'Short-term stays, respite care, and carer relief.', allocated: 6000, enabled: true },
+      { id: 'core_sil', group: 'Core Supports (Flexible)', name: 'Supported Independent Living (SIL)', desc: '24/7 shared or individual home & living support.', allocated: 0, enabled: false },
+      { id: 'cb_sc', group: 'Capacity Building Supports (Stated)', name: 'Support Coordination (Coordination DD)', desc: 'Level 2 / Level 3 Specialist Support Coordination for complex needs.', allocated: 8500, enabled: true },
+      { id: 'cb_daily', group: 'Capacity Building Supports (Stated)', name: 'Improved Daily Living (OT, Psych, Therapy)', desc: 'Occupational Therapy (wheelchair/seating), Psychology, Functional Capacity Assessment.', allocated: 9500, enabled: true },
+      { id: 'cb_health', group: 'Capacity Building Supports (Stated)', name: 'Improved Health & Wellbeing (Dietitian / Physio)', desc: 'Dietitian and Exercise Physiology for obesity & mobility recovery.', allocated: 4500, enabled: true },
+      { id: 'cb_recovery', group: 'Capacity Building Supports (Stated)', name: 'Psychosocial Recovery Coaching', desc: 'Mental health recovery support for Schizophrenia & DID.', allocated: 4200, enabled: true },
+      { id: 'cb_rel', group: 'Capacity Building Supports (Stated)', name: 'Improved Relationships (Behaviour Support)', desc: 'Positive Behaviour Support plans and specialist strategies.', allocated: 0, enabled: false },
+      { id: 'cb_life', group: 'Capacity Building Supports (Stated)', name: 'Improved Life Choices (Plan Management)', desc: 'Plan management fees and financial record keeping.', allocated: 0, enabled: false },
+      { id: 'cb_living', group: 'Capacity Building Supports (Stated)', name: 'Improved Living Arrangements', desc: 'Support to find and keep appropriate housing.', allocated: 0, enabled: false },
+      { id: 'cb_social', group: 'Capacity Building Supports (Stated)', name: 'Increased Social & Community Participation', desc: 'Skill-building programs and community groups.', allocated: 0, enabled: false },
+      { id: 'cb_learning', group: 'Capacity Building Supports (Stated)', name: 'Improved Learning', desc: 'Transitioning to education or life skills training.', allocated: 0, enabled: false },
+      { id: 'cb_job', group: 'Capacity Building Supports (Stated)', name: 'Finding and Keeping a Job', desc: 'Employment preparation and workplace support.', allocated: 0, enabled: false },
+      { id: 'cap_at', group: 'Capital Supports (Stated)', name: 'Assistive Technology (Wheelchair & Seating)', desc: 'Bariatric wheelchair, 4-point harness/seatbelt, pressure cushion.', allocated: 12000, enabled: true },
+      { id: 'cap_at_rep', group: 'Capital Supports (Stated)', name: 'Assistive Technology — Maintenance & Repairs', desc: 'Wheelchair servicing, seatbelt replacement, and short-term hire.', allocated: 1800, enabled: true },
+      { id: 'cap_home', group: 'Capital Supports (Stated)', name: 'Home Modifications', desc: 'Ramps, grab rails, bathroom accessibility modifications.', allocated: 0, enabled: false },
+      { id: 'cap_sda', group: 'Capital Supports (Stated)', name: 'Specialist Disability Accommodation (SDA)', desc: 'High-physical-support accessible housing.', allocated: 0, enabled: false },
+      { id: 'rec_transport', group: 'Recurring Supports', name: 'Recurring Transport Payments', desc: 'Regular fortnightly transport allowance paid directly.', allocated: 0, enabled: false }
+    ];
+
+    const DEFAULT_STATE = {
+      easyRead: false,
+      profile: {
+        name: 'Mum — Care & Guardianship File',
+        ndisNumber: 'Pending Entry',
+        reviewDate: '2026-12-15',
+        coordinator: 'Coordination DD (Pending Review)',
+        trusteeOfficer: 'QLD Public Trustee (1300 360 044)'
+      },
+      catalogueCategories: ['My Daily Care', 'My Wheelchair & Mobility', 'My Mental Health & Calm', 'My Doctors & Therapy', 'My Stays & Outings'],
+      bookmarks: [
+        { id: 'bm1', serviceId: 'epilepsy-qld', name: 'Epilepsy Queensland (Woolloongabba, Brisbane)', category: 'My Doctors & Therapy', phone: '1300 852 853', url: 'https://epilepsyqueensland.com.au/', note: 'Seizure action plan & Living Well support' },
+        { id: 'bm2', serviceId: 'qld-mh-call', name: 'QLD Health 1300 MH CALL (24/7 Mental Health Triage)', category: 'My Mental Health & Calm', phone: '1300 642 255', url: 'https://www.qld.gov.au/health/mental-health-and-wellbeing/how-to-get-help/1300-mh-call', note: '24/7 calm support line' }
+      ],
+      pinnedIds: ['ndis-commission-report', 'ndis-at-assessment', 'ndis-plan-reassessment', 'qld-public-trustee', 'qld-opg', 'epilepsy-qld', 'qld-mh-call'],
+      categories: JSON.parse(JSON.stringify(ALL_NDIS_CATEGORIES)),
+      invoices: [
+        { id: 'inv1', date: '2026-11-20', number: 'INV-8841', provider: 'Brisbane Metro Support Care', categoryId: 'core_daily', amount: 1420.00, status: 'Paid', desc: 'Weekly personal care & meal assistance (18 hrs)' },
+        { id: 'inv2', date: '2026-11-18', number: 'INV-8819', provider: 'Mobility & Continence Supplies QLD', categoryId: 'core_consumables', amount: 345.50, status: 'Paid', desc: 'Monthly continence consumables & non-slip transfer mat' },
+        { id: 'inv3', date: '2026-11-15', number: 'INV-8790', provider: 'Coordination DD Services', categoryId: 'cb_sc', amount: 680.00, status: 'Pending Public Trustee', desc: 'Support Coordination plan review prep & provider liaison' },
+        { id: 'inv4', date: '2026-11-10', number: 'INV-8742', provider: 'SEQ Accessible Respite Stays', categoryId: 'core_sta', amount: 1850.00, status: 'Paid', desc: 'Weekend Short Term Accommodation (STA) respite stay' },
+        { id: 'inv5', date: '2026-11-04', number: 'INV-8699', provider: 'Brisbane Clinical Dietitians', categoryId: 'cb_health', amount: 240.00, status: 'Paid', desc: 'Initial bariatric & wheelchair nutrition consultation' },
+        { id: 'inv6', date: '2026-10-28', number: 'INV-8610', provider: 'QLD Mobility Equipment Hire', categoryId: 'cap_at_rep', amount: 290.00, status: 'Flagged / Disputed', desc: 'Wheelchair inspection & strap check (seatbelt found loose — flagged)' }
+      ],
+      tasks: [
+        { id: 't1', text: 'URGENT: Request emergency OT Wheelchair & 4-point harness/seatbelt assessment (prevent falls during seizures)', done: false },
+        { id: 't2', text: 'Schedule urgent meeting with Support Coordinator (Coordination DD) & Public Trustee regarding NDIS Plan Reassessment', done: false },
+        { id: 't3', text: 'Submit Wheelchair Seatbelt Safety Incident to NDIS Quality & Safeguards Commission', done: false },
+        { id: 't4', text: 'Update Seizure Management Plan with Neurologist & Epilepsy Queensland (FND vs epileptic protocol)', done: false },
+        { id: 't5', text: 'Psychiatry & GP medication reconciliation for Schizophrenia, DID & seizure threshold safety', done: false },
+        { id: 't6', text: 'Connect Coordination DD system via Coordinator Sync Hub to import live claims', done: false }
+      ],
+      careTeam: [
+        { id: 'p1', name: 'Support Coordinator (Coordination DD)', role: 'Level 2/3 NDIS Support Coordination', phone: '', email: '', url: 'https://www.ndis.gov.au/participants/working-providers/support-coordinators-and-plan-managers/how-find-support-coordinator', status: 'Urgent Review' },
+        { id: 'p2', name: 'Queensland Public Trustee', role: 'Financial Administrator', phone: '1300 360 044', email: 'clientenq@pt.qld.gov.au', url: 'https://www.pt.qld.gov.au/financial-administration', status: 'Active' },
+        { id: 'p3', name: 'Occupational Therapist (Wheelchair & AT)', role: 'Bariatric Seating & Restraint Safety', phone: '', email: '', url: 'https://www.ndis.gov.au/participants/assistive-technology/assistive-technology-assessments', status: 'Referral Pending' },
+        { id: 'p4', name: 'Neurologist / FND Specialist', role: 'Seizures & Functional Neurological Disorder', phone: '', email: '', url: 'https://fndaus.org.au/fnd-health-professionals/', status: 'Urgent Review' },
+        { id: 'p5', name: 'Psychiatrist / Mental Health Team', role: 'Schizophrenia & DID Care', phone: '1300 642 255', email: '', url: 'https://www.qld.gov.au/health/mental-health-and-wellbeing/how-to-get-help/1300-mh-call', status: 'Active' },
+        { id: 'p6', name: 'NDIS Dietitian & Exercise Physiologist', role: 'Obesity & Mobility Health Recovery', phone: '', email: '', url: 'https://www.ndis.gov.au/participants/working-providers/finding-providers/provider-finder', status: 'Referral Pending' }
+      ],
+      interactions: [
+        { id: 'i1', provider: 'CareGuard System', channel: 'System Note', date: '2026-11-22', summary: 'Initialized Guardianship CRM following family dinner wheelchair seatbelt & seizure safety incident.' }
+      ],
+      syncLogs: [
+        { id: 's1', date: '2026-11-22 17:54', source: 'CareGuard Initial Ledger', details: 'Loaded 6 baseline invoices and 21 official NDIS funding categories.' }
+      ],
+      ddAgenda: `NDIS PLAN REASSESSMENT & URGENT SAFETY BRIEF — COORDINATION DD & PUBLIC TRUSTEE
+
+1. IMMEDIATE WHEELCHAIR & SEIZURE SAFETY HAZARD
+- During a recent family dinner outing, Mum experienced seizures while seated in her wheelchair.
+- Her wheelchair seatbelt was dangerously loose, creating an immediate risk of falling out.
+- Request: Urgent Occupational Therapy (OT) Assistive Technology review for a bariatric-rated wheelchair, snug pelvic lap belt, and thoracic/chest harness appropriate for seizure episodes.
+
+2. SEIZURE & FND CLINICAL ALIGNMENT
+- Coordinate Neurologist + FND specialist + Epilepsy Queensland to update a written Seizure & FND Action Plan.
+
+3. MENTAL HEALTH & PSYCHOSOCIAL SUPPORTS (SCHIZOPHRENIA & DID)
+- Ensure Specialist Support Coordination / Psychosocial Recovery Coaching and trained support workers.
+
+4. OBESITY & PHYSICAL HEALTH RECOVERY
+- Allocate Capacity Building funding for NDIS Dietitian + Wheelchair-accessible Exercise Physiology.
+
+5. PUBLIC TRUSTEE & COORDINATOR SYNC
+- Confirm invoice approvals with QLD Public Trustee (1300 360 044) and sync Coordination DD CSV exports into CareGuard.`,
+      incidents: [
+        {
+          id: 'inc1',
+          title: 'Seizures at Family Dinner — Loose Wheelchair Seatbelt Fall Hazard',
+          type: 'Seizure + Equipment Hazard',
+          severity: 'Critical',
+          date: '2026-11-21T19:00',
+          details: 'Mum arrived in her wheelchair for a family dinner. While eating, she began having seizures. Her wheelchair seatbelt was very loose, leaving her at severe risk of falling out of the chair during the seizure.',
+          action: 'Immediate OT seating/harness assessment required; escalate to Support Coordinator DD and NDIS Quality & Safeguards Commission.',
+          resolved: false
+        }
+      ],
+      meds: [
+        { id: 'm1', slot: 'Morning (8:00 AM)', label: 'Antipsychotic & Seizure Meds (Blister Pack)', done: false },
+        { id: 'm2', slot: 'Midday (12:30 PM)', label: 'Hydration & Nutritional Check', done: false },
+        { id: 'm3', slot: 'Evening (6:00 PM)', label: 'Evening Dose + Wheelchair Strap Check', done: false },
+        { id: 'm4', slot: 'Night (9:00 PM)', label: 'Night Meds & Calm Grounding Routine', done: false }
+      ],
+      appointments: [
+        { id: 'a1', title: 'Urgent Meeting: Support Coordinator (Coordination DD) — Wheelchair & Plan Review', date: '2026-11-25', done: false },
+        { id: 'a2', title: 'Occupational Therapist — Wheelchair Seatbelt & Bariatric Seating Assessment', date: '2026-11-27', done: false },
+        { id: 'a3', title: 'GP / Neurologist — Seizure & FND Medication / Action Plan Review', date: '2026-12-02', done: false }
+      ]
+    };
+
+    const STORAGE_KEY = 'careguard_ndis_crm_v3';
+    let state = loadState();
+    let activeCategory = 'All';
+    let invSortNewest = true;
+    let budgetChartInstance = null;
+    let pieChartInstance = null;
+    let planPieChartInstance = null;
+    let timerInterval = null;
+    let timerSeconds = 0;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.remove('hidden'); toast.classList.add('flex');
+      setTimeout(() => { toast.classList.add('hidden'); toast.classList.remove('flex'); }, 2600);
+    }
+
+    function copyText(text, label = 'Copied to clipboard') {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast(label)).catch(() => fallbackCopy(text, label));
+      } else { fallbackCopy(text, label); }
+    }
+
+    function fallbackCopy(text, label) {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); showToast(label); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+    function getCategorySpent(catId) {
+      return state.invoices
+        .filter(inv => inv.categoryId === catId && inv.status !== 'Flagged / Disputed')
+        .reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
+    }
+
+    function getActiveBudgetTotals() {
+      const activeCats = state.categories.filter(c => c.enabled);
+      const totalAllocated = activeCats.reduce((s, c) => s + Number(c.allocated || 0), 0);
+      const totalSpent = activeCats.reduce((s, c) => s + getCategorySpent(c.id), 0);
+      const totalRemaining = Math.max(0, totalAllocated - totalSpent);
+      return { activeCats, totalAllocated, totalSpent, totalRemaining };
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      const panel = document.getElementById('tab-' + tabName);
+      const btn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+      if (panel) panel.classList.remove('hidden');
+      if (btn) btn.classList.add('active');
+      if (tabName === 'dashboard') { renderCharts(); }
+      if (tabName === 'ndisplan') { renderPlanTabPieChart(); }
+    }
+
+    function renderPinnedBar() {
+      const bar = document.getElementById('pinnedBar');
+      const pinned = VERIFIED_SERVICES.filter(s => state.pinnedIds.includes(s.id));
+      bar.innerHTML = pinned.length
+        ? pinned.map(s => `<a href="${s.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-900/90 hover:bg-indigo-800 text-white border border-indigo-700/70 transition"><span>${s.name.split('—')[0].trim()}</span><i data-lucide="external-link" class="w-3 h-3 text-indigo-300"></i></a>`).join('')
+        : '<span class="text-indigo-300 italic">Pin services from the 1-Click Hub to show them here.</span>';
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function renderProfileAndKpis() {
+      const p = state.profile;
+      document.getElementById('profileNameDisplay').textContent = p.name;
+      document.getElementById('profileNdisDisplay').textContent = `NDIS #: ${p.ndisNumber || 'Pending'}`;
+      document.getElementById('profileDetailsDisplay').innerHTML = `Support Coordinator (DD): <span class="font-semibold text-slate-800">${p.coordinator}</span> • Public Trustee: <span class="font-semibold text-slate-800">${p.trusteeOfficer}</span> • Review Date: <span class="font-semibold text-slate-800">${p.reviewDate || 'TBD'}</span>`;
+
+      const { activeCats, totalAllocated, totalSpent, totalRemaining } = getActiveBudgetTotals();
+      const pct = totalAllocated > 0 ? Math.round((totalSpent / totalAllocated) * 100) : 0;
+
+      document.getElementById('kpiRemainingMoney').textContent = '$' + totalRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 });
+      document.getElementById('kpiBudgetSub').textContent = `$${totalSpent.toLocaleString(undefined, { maximumFractionDigits: 0 })} spent of $${totalAllocated.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+      document.getElementById('kpiBudgetPct').textContent = `${pct}%`;
+      document.getElementById('kpiActiveCategories').textContent = `${activeCats.length} active NDIS categories`;
+      document.getElementById('kpiOpenIncidents').textContent = state.incidents.filter(i => !i.resolved).length;
+      document.getElementById('kpiTasksPending').textContent = state.tasks.filter(t => !t.done).length;
+      document.getElementById('kpiInvoicesCount').textContent = `${state.invoices.length} invoices logged`;
+    }
+
+    function renderCharts() {
+      if (typeof Chart === 'undefined') return;
+      const { activeCats, totalSpent, totalRemaining } = getActiveBudgetTotals();
+
+      const pieCanvas = document.getElementById('expenditurePieChart');
+      if (pieCanvas) {
+        if (pieChartInstance) pieChartInstance.destroy();
+        pieChartInstance = new Chart(pieCanvas, {
+          type: 'doughnut',
+          data: {
+            labels: ['Money Spent ($)', 'Money Left ($)'],
+            datasets: [{ data: [totalSpent, totalRemaining], backgroundColor: ['#4f46e5', '#10b981'], borderWidth: 3, borderColor: '#ffffff' }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '64%',
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12, weight: '600' } } } }
+          }
+        });
+      }
+
+      const barCanvas = document.getElementById('budgetChart');
+      if (barCanvas) {
+        if (budgetChartInstance) budgetChartInstance.destroy();
+        const topCats = activeCats.slice(0, 8);
+        budgetChartInstance = new Chart(barCanvas, {
+          type: 'bar',
+          data: {
+            labels: topCats.map(c => c.name.split('(')[0].trim().slice(0, 18)),
+            datasets: [
+              { label: 'Spent ($)', data: topCats.map(c => getCategorySpent(c.id)), backgroundColor: '#4f46e5', borderRadius: 5 },
+              { label: 'Remaining ($)', data: topCats.map(c => Math.max(0, Number(c.allocated || 0) - getCategorySpent(c.id))), backgroundColor: '#cbd5e1', borderRadius: 5 }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
+              y: { stacked: true, ticks: { callback: v => '$' + (v / 1000) + 'k' } }
+            },
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
+          }
+        });
+      }
+    }
+
+    function renderPlanTabPieChart() {
+      const canvas = document.getElementById('planTabPieChart');
+      if (!canvas || typeof Chart === 'undefined') return;
+      const { totalSpent, totalRemaining } = getActiveBudgetTotals();
+      if (planPieChartInstance) planPieChartInstance.destroy();
+      planPieChartInstance = new Chart(canvas, {
+        type: 'pie',
+        data: {
+          labels: ['Spent ($)', 'Remaining ($)'],
+          datasets: [{ data: [totalSpent, totalRemaining], backgroundColor: ['#4f46e5', '#10b981'], borderColor: '#ffffff', borderWidth: 3 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+
+    function renderChecklist() {
+      document.getElementById('urgentChecklist').innerHTML = state.tasks.map(t => `
+        <div class="flex items-start justify-between gap-2 p-3 rounded-xl border ${t.done ? 'bg-slate-50 border-slate-200 opacity-70' : 'bg-white border-slate-200'}">
+          <label class="flex items-start gap-2.5 cursor-pointer flex-1">
+            <input type="checkbox" ${t.done ? 'checked' : ''} data-task-toggle="${t.id}" class="mt-0.5 rounded border-slate-300 text-indigo-600 cursor-pointer" />
+            <span class="text-xs sm:text-sm ${t.done ? 'line-through text-slate-400' : 'text-slate-800 font-medium'}">${t.text}</span>
+          </label>
+          <button data-task-del="${t.id}" class="text-slate-400 hover:text-rose-600 p-1 cursor-pointer"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+        </div>
+      `).join('');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function renderInvoices() {
+      const catFilter = document.getElementById('invCategoryFilter');
+      const currentVal = catFilter.value || 'All';
+      catFilter.innerHTML = '<option value="All">All NDIS Categories</option>' +
+        state.categories.filter(c => c.enabled).map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      catFilter.value = currentVal;
+
+      document.getElementById('invCategory').innerHTML = state.categories.filter(c => c.enabled).map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+      const q = (document.getElementById('invSearchInput').value || '').toLowerCase().trim();
+      const selCat = catFilter.value;
+      const selStatus = document.getElementById('invStatusFilter').value;
+
+      let list = state.invoices.filter(inv => {
+        const matchQ = !q || inv.provider.toLowerCase().includes(q) || inv.number.toLowerCase().includes(q) || (inv.desc && inv.desc.toLowerCase().includes(q));
+        const matchCat = selCat === 'All' || inv.categoryId === selCat;
+        const matchStatus = selStatus === 'All' || inv.status === selStatus;
+        return matchQ && matchCat && matchStatus;
+      });
+      list.sort((a, b) => invSortNewest ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date));
+
+      const tbody = document.getElementById('invoiceTableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-500">No invoices match your filter.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(inv => {
+        const cat = state.categories.find(c => c.id === inv.categoryId);
+        const catName = cat ? cat.name : inv.categoryId;
+        const badge = inv.status === 'Paid' ? 'bg-emerald-100 text-emerald-800' : inv.status === 'Pending Public Trustee' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800';
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-3 px-4 font-medium text-slate-900 whitespace-nowrap">${inv.date}</td>
+            <td class="py-3 px-4 font-mono text-xs text-slate-600">${inv.number}</td>
+            <td class="py-3 px-4"><div class="font-semibold text-slate-900">${inv.provider}</div><div class="text-xs text-slate-500">${inv.desc || ''}</div></td>
+            <td class="py-3 px-4 text-xs text-slate-700">${catName}</td>
+            <td class="py-3 px-4 font-bold text-slate-900">$${Number(inv.amount).toFixed(2)}</td>
+            <td class="py-3 px-4">
+              <select data-inv-status="${inv.id}" class="px-2 py-1 rounded-lg text-xs font-semibold ${badge} cursor-pointer">
+                <option value="Paid" ${inv.status === 'Paid' ? 'selected' : ''}>Paid</option>
+                <option value="Pending Public Trustee" ${inv.status === 'Pending Public Trustee' ? 'selected' : ''}>Pending Public Trustee</option>
+                <option value="Flagged / Disputed" ${inv.status === 'Flagged / Disputed' ? 'selected' : ''}>Flagged / Disputed</option>
+              </select>
+            </td>
+            <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+              <button data-view-inv="${inv.id}" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold cursor-pointer">View</button>
+              <button data-del-inv="${inv.id}" class="p-1 text-slate-400 hover:text-rose-600 cursor-pointer"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function renderBudgetEditor() {
+      const activeCats = state.categories.filter(c => c.enabled);
+      document.getElementById('budgetEditorRows').innerHTML = activeCats.map(c => {
+        const spent = getCategorySpent(c.id);
+        const rem = Math.max(0, Number(c.allocated || 0) - spent);
+        return `
+          <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-slate-800">
+              <span>${c.name} <span class="text-[11px] font-normal text-slate-500">(${c.group.split(' ')[0]})</span></span>
+              <span class="text-emerald-700">Spent: $${spent.toLocaleString()} • Left: $${rem.toLocaleString()}</span>
+            </div>
+            <div class="flex items-center gap-3 text-xs">
+              <label class="text-slate-500 shrink-0">Plan Allocation ($):</label>
+              <input type="number" min="0" value="${c.allocated}" data-cat-alloc="${c.id}" class="w-36 px-2.5 py-1 rounded-lg border border-slate-300 bg-white font-semibold" />
+            </div>
+          </div>
+        `;
+      }).join('');
+      const { totalRemaining } = getActiveBudgetTotals();
+      document.getElementById('budgetRemainingTotal').textContent = '$' + totalRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 });
+      document.getElementById('ddAgendaTextarea').value = state.ddAgenda;
+    }
+
+    function renderSettingsCategories() {
+      const groups = [...new Set(state.categories.map(c => c.group))];
+      document.getElementById('settingsCategoriesContainer').innerHTML = groups.map(grp => `
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+          <h3 class="text-sm font-bold text-indigo-900 border-b border-slate-100 pb-2">${grp}</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            ${state.categories.filter(c => c.group === grp).map(c => `
+              <div class="flex items-center justify-between gap-3 p-3 rounded-xl border ${c.enabled ? 'border-indigo-200 bg-indigo-50/40' : 'border-slate-200 bg-slate-50 opacity-75'}">
+                <div class="space-y-0.5"><div class="text-xs sm:text-sm font-bold text-slate-900">${c.name}</div><div class="text-xs text-slate-500">${c.desc}</div></div>
+                <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input type="checkbox" ${c.enabled ? 'checked' : ''} data-toggle-cat="${c.id}" class="sr-only peer" />
+                  <div class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderSyncLogs() {
+      document.getElementById('syncLogList').innerHTML = state.syncLogs.map(l => `
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs flex flex-wrap items-center justify-between gap-2">
+          <div><span class="font-bold text-slate-900">${l.source}</span> — <span class="text-slate-700">${l.details}</span></div>
+          <span class="text-slate-500">${l.date}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderBookmarkedCatalogue() {
+      const filterEl = document.getElementById('catalogueCatFilter');
+      const cur = filterEl.value || 'All';
+      filterEl.innerHTML = '<option value="All">All Catalogue Categories</option>' +
+        state.catalogueCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+      filterEl.value = cur;
+      document.getElementById('bmCategorySelect').innerHTML = state.catalogueCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+      document.getElementById('csCategory').innerHTML = state.catalogueCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      const list = state.bookmarks.filter(b => cur === 'All' || b.category === cur);
+      const grid = document.getElementById('bookmarkedCatalogueGrid');
+      grid.innerHTML = list.length ? list.map(b => `
+        <div class="bg-white rounded-xl border border-amber-200 p-3.5 shadow-sm flex flex-col justify-between gap-2">
+          <div>
+            <div class="flex items-start justify-between gap-2">
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-100 text-amber-900">${b.category}</span>
+              <button data-remove-bm="${b.id}" class="text-slate-400 hover:text-rose-600 cursor-pointer" title="Remove bookmark"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <h4 class="text-sm font-bold text-slate-900 mt-1.5">${b.name}</h4>
+            ${b.note ? `<p class="text-xs text-slate-600 mt-1">${b.note}</p>` : ''}
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
+            ${b.url ? `<a href="${b.url}" target="_blank" rel="noopener noreferrer" class="flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold">Open <i data-lucide="external-link" class="w-3 h-3"></i></a>` : ''}
+            ${b.phone ? `<button data-copy="${b.phone}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold cursor-pointer"><i data-lucide="phone" class="w-3 h-3 text-teal-600"></i> ${b.phone}</button>` : ''}
+          </div>
+        </div>
+      `).join('') : '<div class="col-span-full text-center py-6 text-xs text-amber-900/70 bg-white/70 rounded-xl border border-amber-200">No supports bookmarked in this category yet. Click <strong>★ Bookmark</strong> on any card below!</div>';
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function renderDirectory() {
+      const categories = ['All', ...new Set(VERIFIED_SERVICES.map(s => s.category))];
+      document.getElementById('dirCategoryFilters').innerHTML = categories.map(cat => `
+        <button data-cat="${cat}" class="px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition ${activeCategory === cat ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">${cat}</button>
+      `).join('');
+      const q = (document.getElementById('dirSearchInput').value || '').toLowerCase().trim();
+      const filtered = VERIFIED_SERVICES.filter(s => (activeCategory === 'All' || s.category === activeCategory) && (!q || s.name.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q) || (s.phone && s.phone.includes(q))));
+      document.getElementById('directoryGrid').innerHTML = filtered.length ? filtered.map(s => {
+        const isPinned = state.pinnedIds.includes(s.id);
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between gap-3">
+            <div class="space-y-2">
+              <div class="flex items-start justify-between gap-2">
+                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-50 text-indigo-700">${s.badge}</span>
+                <button data-pin-id="${s.id}" class="p-1 rounded-md cursor-pointer ${isPinned ? 'text-amber-500 bg-amber-50' : 'text-slate-400 hover:text-slate-600'}"><i data-lucide="pin" class="w-4 h-4"></i></button>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 leading-snug">${s.name}</h3>
+              <p class="text-xs text-slate-600 leading-relaxed">${s.desc}</p>
+            </div>
+            <div class="space-y-2 pt-2 border-t border-slate-100">
+              <div class="flex flex-wrap gap-1.5">
+                <a href="${s.url}" target="_blank" rel="noopener noreferrer" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold">1-Click Open <i data-lucide="external-link" class="w-3.5 h-3.5"></i></a>
+                ${s.phone ? `<button data-copy="${s.phone}" class="inline-flex items-center gap-1 px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold cursor-pointer"><i data-lucide="phone" class="w-3.5 h-3.5 text-teal-600"></i> ${s.phone}</button>` : ''}
+                ${s.email ? `<button data-copy="${s.email}" class="inline-flex items-center gap-1 px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold cursor-pointer"><i data-lucide="mail" class="w-3.5 h-3.5 text-indigo-600"></i> Email</button>` : ''}
+              </div>
+              <div class="grid grid-cols-2 gap-1.5">
+                <button data-bookmark-id="${s.id}" class="py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-xs font-semibold text-amber-800 cursor-pointer">★ Bookmark</button>
+                <button data-log-provider="${s.name}" class="py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-medium text-slate-600 cursor-pointer">+ Log Call</button>
+              </div>
+            </div>
+          </div>`;
+      }).join('') : '<div class="col-span-full text-center py-10 text-sm text-slate-500 bg-white rounded-2xl border border-slate-200">No matching services found.</div>';
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function renderCareTeam() {
+      document.getElementById('careTeamGrid').innerHTML = state.careTeam.map(p => {
+        const badgeClass = p.status === 'Urgent Review' ? 'bg-rose-100 text-rose-800' : p.status === 'Active' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div><h3 class="text-sm font-bold text-slate-900">${p.name}</h3><p class="text-xs text-slate-500">${p.role}</p></div>
+              <select data-pr-status="${p.id}" class="px-2 py-1 rounded-lg text-xs font-semibold border border-slate-200 ${badgeClass} cursor-pointer">
+                <option value="Urgent Review" ${p.status === 'Urgent Review' ? 'selected' : ''}>Urgent Review</option>
+                <option value="Active" ${p.status === 'Active' ? 'selected' : ''}>Active</option>
+                <option value="Referral Pending" ${p.status === 'Referral Pending' ? 'selected' : ''}>Referral Pending</option>
+              </select>
+            </div>
+            <div class="flex flex-wrap gap-2 text-xs text-slate-600">
+              ${p.phone ? `<button data-copy="${p.phone}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 cursor-pointer"><i data-lucide="phone" class="w-3 h-3"></i> ${p.phone}</button>` : '<span class="text-slate-400 italic">No phone saved</span>'}
+              ${p.email ? `<button data-copy="${p.email}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 cursor-pointer"><i data-lucide="mail" class="w-3 h-3"></i> ${p.email}</button>` : ''}
+            </div>
+            <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+              <div class="flex items-center gap-2">
+                ${p.url ? `<a href="${p.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold">Open Portal <i data-lucide="external-link" class="w-3 h-3"></i></a>` : ''}
+                <button data-log-provider="${p.name}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer">Log Call</button>
+              </div>
+              <button data-del-provider="${p.id}" class="text-slate-400 hover:text-rose-600 p-1 cursor-pointer"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </div>
+          </div>`;
+      }).join('');
+      document.getElementById('interactionLogList').innerHTML = state.interactions.map(i => `
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+          <div class="flex items-center justify-between"><span class="font-bold text-slate-900">${i.provider}</span><span class="text-slate-500">${i.channel} • ${i.date}</span></div>
+          <p class="text-slate-700">${i.summary}</p>
+        </div>`).join('');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function renderIncidents() {
+      document.getElementById('incidentList').innerHTML = state.incidents.map(inc => {
+        const sevColor = inc.severity === 'Critical' ? 'bg-rose-100 text-rose-800 border-rose-200' : inc.severity === 'High' ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-slate-100 text-slate-700 border-slate-200';
+        return `
+          <div class="p-4 rounded-xl border ${inc.resolved ? 'bg-slate-50 border-slate-200 opacity-75' : 'bg-white border-rose-200'} space-y-2">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-md text-[11px] font-bold border ${sevColor}">${inc.severity}</span>
+                  <span class="text-xs font-medium text-slate-500">${inc.type} • ${inc.date.replace('T', ' ')}</span>
+                </div>
+                <h3 class="text-sm font-bold text-slate-900 mt-1">${inc.title}</h3>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button data-copy-inc="${inc.id}" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold cursor-pointer">Copy Report</button>
+                <button data-toggle-inc="${inc.id}" class="px-2.5 py-1 rounded-lg ${inc.resolved ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'} text-xs font-semibold cursor-pointer">${inc.resolved ? 'Resolved' : 'Mark Resolved'}</button>
+              </div>
+            </div>
+            <p class="text-xs text-slate-700 leading-relaxed">${inc.details}</p>
+            ${inc.action ? `<p class="text-xs text-indigo-800 bg-indigo-50/70 px-2.5 py-1.5 rounded-lg"><strong>Action:</strong> ${inc.action}</p>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    function renderMedsAndAppointments() {
+      document.getElementById('medsGrid').innerHTML = state.meds.map(m => `
+        <label class="p-3 rounded-xl border ${m.done ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'} flex items-start gap-2 cursor-pointer">
+          <input type="checkbox" ${m.done ? 'checked' : ''} data-med-toggle="${m.id}" class="mt-0.5 rounded border-slate-300 text-emerald-600 cursor-pointer" />
+          <div class="text-xs"><div class="font-bold text-slate-900">${m.slot}</div><div class="${m.done ? 'line-through text-slate-400' : 'text-slate-600'}">${m.label}</div></div>
+        </label>
+      `).join('');
+      document.getElementById('apptList').innerHTML = state.appointments.map(a => `
+        <div class="py-3 flex items-center justify-between gap-3">
+          <label class="flex items-center gap-2.5 cursor-pointer">
+            <input type="checkbox" ${a.done ? 'checked' : ''} data-appt-toggle="${a.id}" class="rounded border-slate-300 text-indigo-600 cursor-pointer" />
+            <div><p class="text-xs sm:text-sm font-medium ${a.done ? 'line-through text-slate-400' : 'text-slate-900'}">${a.title}</p><p class="text-xs text-slate-500">${a.date}</p></div>
+          </label>
+          <button data-appt-del="${a.id}" class="text-slate-400 hover:text-rose-600 p-1 cursor-pointer"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>
+      `).join('');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function renderAll() {
+      if (state.easyRead) document.body.classList.add('easy-read');
+      else document.body.classList.remove('easy-read');
+      renderPinnedBar();
+      renderProfileAndKpis();
+      renderCharts();
+      renderChecklist();
+      renderInvoices();
+      renderBudgetEditor();
+      renderSettingsCategories();
+      renderSyncLogs();
+      renderBookmarkedCatalogue();
+      renderDirectory();
+      renderCareTeam();
+      renderIncidents();
+      renderMedsAndAppointments();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function parseAndImportRows(rawText, sourceName) {
+      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      let added = 0;
+      lines.forEach((line, idx) => {
+        if (idx === 0 && line.toLowerCase().includes('provider') && line.toLowerCase().includes('amount')) return;
+        const parts = line.includes('\t') ? line.split('\t') : line.split(',');
+        if (parts.length < 4) return;
+        const date = (parts[0] || '').trim().slice(0, 10) || new Date().toISOString().slice(0, 10);
+        const number = (parts[1] || '').trim() || ('SYNC-' + Math.floor(1000 + Math.random() * 9000));
+        const provider = (parts[2] || '').trim() || 'Synced Provider';
+        const catText = (parts[3] || '').toLowerCase();
+        const amount = parseFloat((parts[4] || '0').replace(/[^0-9.]/g, '')) || 0;
+        const statusRaw = (parts[5] || 'Pending Public Trustee').trim();
+        const matchedCat = state.categories.find(c => c.name.toLowerCase().includes(catText) || c.id === catText) || state.categories.find(c => c.enabled) || state.categories[0];
+        if (!matchedCat.enabled) matchedCat.enabled = true;
+        state.invoices.unshift({ id: 'inv' + Date.now() + idx, date, number, provider, categoryId: matchedCat.id, amount, status: statusRaw, desc: `Synced from ${sourceName}` });
+        added++;
+      });
+      if (added > 0) {
+        state.syncLogs.unshift({ id: 's' + Date.now(), date: new Date().toISOString().slice(0, 16).replace('T', ' '), source: sourceName, details: `Imported ${added} invoice(s) & auto-updated NDIS budget.` });
+        saveState(); renderAll(); showToast(`Synced ${added} record(s) from ${sourceName}`);
+      } else {
+        showToast('No valid rows found. Format: Date, Invoice#, Provider, Category, Amount, Status');
+      }
+    }
+
+    // Event Listeners
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+    document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchTab(btn.dataset.tab);
+        document.querySelectorAll('.mobile-tab-btn').forEach(b => b.classList.remove('text-indigo-600', 'font-semibold'));
+        btn.classList.add('text-indigo-600', 'font-semibold');
+      });
+    });
+
+    document.getElementById('bannerLogIncidentBtn').addEventListener('click', () => switchTab('incidents'));
+    document.getElementById('quickAddIncidentBtn').addEventListener('click', () => switchTab('incidents'));
+    document.getElementById('easyReadToggleBtn').addEventListener('click', () => {
+      state.easyRead = !state.easyRead; saveState(); renderAll();
+      showToast(state.easyRead ? 'Easy Read Large Text ON' : 'Standard Text Size');
+    });
+
+    document.body.addEventListener('click', e => {
+      const jump = e.target.closest('[data-jump-tab]');
+      if (jump) { switchTab(jump.dataset.jumpTab); return; }
+      const copyBtn = e.target.closest('[data-copy]');
+      if (copyBtn) { copyText(copyBtn.dataset.copy, `Copied: ${copyBtn.dataset.copy}`); return; }
+      const pinBtn = e.target.closest('[data-pin-id]');
+      if (pinBtn) {
+        const id = pinBtn.dataset.pinId;
+        state.pinnedIds = state.pinnedIds.includes(id) ? state.pinnedIds.filter(x => x !== id) : [...state.pinnedIds, id];
+        saveState(); renderPinnedBar(); renderDirectory(); return;
+      }
+      const bmBtn = e.target.closest('[data-bookmark-id]');
+      if (bmBtn) {
+        const svc = VERIFIED_SERVICES.find(x => x.id === bmBtn.dataset.bookmarkId);
+        if (svc) {
+          document.getElementById('bmServiceId').value = svc.id;
+          document.getElementById('bmServiceName').textContent = svc.name;
+          document.getElementById('bmNewCategory').value = '';
+          document.getElementById('bmNote').value = '';
+          document.getElementById('bookmarkModal').classList.remove('hidden'); document.getElementById('bookmarkModal').classList.add('flex');
+        }
+        return;
+      }
+      const remBm = e.target.closest('[data-remove-bm]');
+      if (remBm) { state.bookmarks = state.bookmarks.filter(b => b.id !== remBm.dataset.removeBm); saveState(); renderBookmarkedCatalogue(); showToast('Removed from catalogue'); return; }
+      const logBtn = e.target.closest('[data-log-provider]');
+      if (logBtn) {
+        document.getElementById('logProviderName').value = logBtn.dataset.logProvider;
+        document.getElementById('logModalTitle').textContent = `Log Contact — ${logBtn.dataset.logProvider}`;
+        document.getElementById('logModal').classList.remove('hidden'); document.getElementById('logModal').classList.add('flex');
+        return;
+      }
+      const viewInv = e.target.closest('[data-view-inv]');
+      if (viewInv) {
+        const inv = state.invoices.find(i => i.id === viewInv.dataset.viewInv);
+        if (inv) {
+          const cat = state.categories.find(c => c.id === inv.categoryId);
+          document.getElementById('invDetailBody').innerHTML = `<p><strong>Date:</strong> ${inv.date}</p><p><strong>Invoice #:</strong> ${inv.number}</p><p><strong>Provider:</strong> ${inv.provider}</p><p><strong>NDIS Category:</strong> ${cat ? cat.name : inv.categoryId}</p><p><strong>Amount:</strong> $${Number(inv.amount).toFixed(2)} AUD</p><p><strong>Status:</strong> ${inv.status}</p><p><strong>Description:</strong> ${inv.desc || 'N/A'}</p>`;
+          document.getElementById('copyInvDetailBtn').onclick = () => copyText(`Invoice ${inv.number} | ${inv.date} | ${inv.provider} | $${Number(inv.amount).toFixed(2)} | ${inv.status}`, 'Invoice details copied');
+          document.getElementById('invoiceDetailModal').classList.remove('hidden'); document.getElementById('invoiceDetailModal').classList.add('flex');
+        }
+        return;
+      }
+      const delInv = e.target.closest('[data-del-inv]');
+      if (delInv) { state.invoices = state.invoices.filter(i => i.id !== delInv.dataset.delInv); saveState(); renderAll(); return; }
+      const taskDel = e.target.closest('[data-task-del]');
+      if (taskDel) { state.tasks = state.tasks.filter(t => t.id !== taskDel.dataset.taskDel); saveState(); renderChecklist(); renderProfileAndKpis(); return; }
+      const prDel = e.target.closest('[data-del-provider]');
+      if (prDel) { state.careTeam = state.careTeam.filter(p => p.id !== prDel.dataset.delProvider); saveState(); renderCareTeam(); return; }
+      const copyInc = e.target.closest('[data-copy-inc]');
+      if (copyInc) {
+        const inc = state.incidents.find(i => i.id === copyInc.dataset.copyInc);
+        if (inc) copyText(`INCIDENT REPORT (${inc.severity})\nParticipant: ${state.profile.name} (NDIS: ${state.profile.ndisNumber})\nTitle: ${inc.title}\nType: ${inc.type}\nDate: ${inc.date}\nDetails: ${inc.details}\nAction: ${inc.action}`, 'Incident report copied');
+        return;
+      }
+      const toggleInc = e.target.closest('[data-toggle-inc]');
+      if (toggleInc) {
+        const inc = state.incidents.find(i => i.id === toggleInc.dataset.toggleInc);
+        if (inc) { inc.resolved = !inc.resolved; saveState(); renderIncidents(); renderProfileAndKpis(); }
+        return;
+      }
+      const apptDel = e.target.closest('[data-appt-del]');
+      if (apptDel) { state.appointments = state.appointments.filter(a => a.id !== apptDel.dataset.apptDel); saveState(); renderMedsAndAppointments(); }
+    });
+
+    document.body.addEventListener('change', e => {
+      if (e.target.dataset.toggleCat) {
+        const cat = state.categories.find(c => c.id === e.target.dataset.toggleCat);
+        if (cat) { cat.enabled = e.target.checked; saveState(); renderAll(); showToast(`${cat.name} turned ${cat.enabled ? 'ON' : 'OFF'}`); }
+      }
+      if (e.target.dataset.invStatus) {
+        const inv = state.invoices.find(i => i.id === e.target.dataset.invStatus);
+        if (inv) { inv.status = e.target.value; saveState(); renderAll(); }
+      }
+      if (e.target.dataset.taskToggle) {
+        const t = state.tasks.find(x => x.id === e.target.dataset.taskToggle);
+        if (t) { t.done = e.target.checked; saveState(); renderChecklist(); renderProfileAndKpis(); }
+      }
+      if (e.target.dataset.medToggle) {
+        const m = state.meds.find(x => x.id === e.target.dataset.medToggle);
+        if (m) { m.done = e.target.checked; saveState(); renderMedsAndAppointments(); }
+      }
+      if (e.target.dataset.prStatus) {
+        const p = state.careTeam.find(x => x.id === e.target.dataset.prStatus);
+        if (p) { p.status = e.target.value; saveState(); renderCareTeam(); }
+      }
+      if (e.target.dataset.apptToggle) {
+        const a = state.appointments.find(x => x.id === e.target.dataset.apptToggle);
+        if (a) { a.done = e.target.checked; saveState(); renderMedsAndAppointments(); }
+      }
+    });
+
+    document.body.addEventListener('input', e => {
+      if (e.target.dataset.catAlloc) {
+        const cat = state.categories.find(c => c.id === e.target.dataset.catAlloc);
+        if (cat) { cat.allocated = Number(e.target.value || 0); saveState(); renderProfileAndKpis(); renderCharts(); renderPlanTabPieChart(); }
+      }
+    });
+
+    document.getElementById('enableAllCatsBtn').addEventListener('click', () => { state.categories.forEach(c => c.enabled = true); saveState(); renderAll(); showToast('All 21 NDIS categories turned ON'); });
+    document.getElementById('resetDefaultCatsBtn').addEventListener('click', () => {
+      const defaults = ALL_NDIS_CATEGORIES.reduce((m, c) => (m[c.id] = c.enabled, m), {});
+      state.categories.forEach(c => c.enabled = !!defaults[c.id]);
+      saveState(); renderAll(); showToast("Restored Mum's recommended NDIS categories");
+    });
+
+    document.getElementById('toggleInvoiceSortBtn').addEventListener('click', () => {
+      invSortNewest = !invSortNewest;
+      document.getElementById('toggleInvoiceSortBtn').innerHTML = `<i data-lucide="arrow-up-down" class="w-3.5 h-3.5"></i> Sort: ${invSortNewest ? 'Newest First' : 'Oldest First'}`;
+      renderInvoices();
+    });
+    ['invSearchInput', 'invCategoryFilter', 'invStatusFilter'].forEach(id => document.getElementById(id).addEventListener('input', renderInvoices));
+
+    const invoiceModal = document.getElementById('invoiceModal');
+    document.getElementById('openAddInvoiceModalBtn').addEventListener('click', () => { document.getElementById('invDate').value = new Date().toISOString().slice(0, 10); invoiceModal.classList.remove('hidden'); invoiceModal.classList.add('flex'); });
+    ['closeInvoiceModalBtn', 'cancelInvoiceModalBtn'].forEach(id => document.getElementById(id).addEventListener('click', () => { invoiceModal.classList.add('hidden'); invoiceModal.classList.remove('flex'); }));
+    document.getElementById('invoiceForm').addEventListener('submit', e => {
+      e.preventDefault();
+      state.invoices.unshift({ id: 'inv' + Date.now(), date: document.getElementById('invDate').value, number: document.getElementById('invNumber').value.trim(), provider: document.getElementById('invProvider').value.trim(), categoryId: document.getElementById('invCategory').value, amount: parseFloat(document.getElementById('invAmount').value || 0), status: document.getElementById('invStatus').value, desc: document.getElementById('invDesc').value.trim() });
+      e.target.reset(); saveState(); renderAll(); invoiceModal.classList.add('hidden'); invoiceModal.classList.remove('flex'); showToast('Invoice added & budget updated');
+    });
+
+    ['closeInvDetailBtn', 'closeInvDetailBtn2'].forEach(id => document.getElementById(id).addEventListener('click', () => { document.getElementById('invoiceDetailModal').classList.add('hidden'); document.getElementById('invoiceDetailModal').classList.remove('flex'); }));
+
+    document.getElementById('exportCsvBtn').addEventListener('click', () => {
+      const header = 'Date,InvoiceNumber,Provider,Category,Amount,Status,Description\n';
+      const rows = state.invoices.map(i => { const cat = state.categories.find(c => c.id === i.categoryId); return `"${i.date}","${i.number}","${i.provider}","${cat ? cat.name : i.categoryId}",${i.amount},"${i.status}","${(i.desc || '').replace(/"/g, '""')}"`; }).join('\n');
+      const blob = new Blob([header + rows], { type: 'text/csv' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'CareGuard_NDIS_Sync.csv'; a.click(); showToast('Universal CSV exported');
+    });
+
+    document.getElementById('copyCoordinatorInviteBtn').addEventListener('click', () => {
+      copyText(`Subject: NDIS CareGuard Sync — ${state.profile.name} (NDIS: ${state.profile.ndisNumber})\n\nHi Support Coordinator (DD) / Plan Manager,\n\nTo keep Mum's NDIS plan, wheelchair safety follow-ups, and invoices aligned across all providers and the QLD Public Trustee, please reply with a CSV export from your system (SupportAbility, Careview, ShiftCare, Xero, or Excel) with columns:\nDate, InvoiceNumber, Provider, Category, Amount, Status\n\nWe will sync it directly into CareGuard.\nThank you!`, 'Coordinator Sync Email copied');
+    });
+
+    document.getElementById('importCsvInput').addEventListener('change', e => {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader(); reader.onload = ev => parseAndImportRows(ev.target.result, file.name); reader.readAsText(file);
+    });
+    document.getElementById('runPasteSyncBtn').addEventListener('click', () => {
+      const txt = document.getElementById('pasteSyncTextarea').value; if (!txt.trim()) return;
+      parseAndImportRows(txt, 'Pasted Coordinator Table'); document.getElementById('pasteSyncTextarea').value = '';
+    });
+
+    document.getElementById('catalogueCatFilter').addEventListener('change', renderBookmarkedCatalogue);
+    ['closeBookmarkModalBtn', 'cancelBookmarkModalBtn'].forEach(id => document.getElementById(id).addEventListener('click', () => { document.getElementById('bookmarkModal').classList.add('hidden'); document.getElementById('bookmarkModal').classList.remove('flex'); }));
+    document.getElementById('bookmarkForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const svc = VERIFIED_SERVICES.find(x => x.id === document.getElementById('bmServiceId').value); if (!svc) return;
+      const newCat = document.getElementById('bmNewCategory').value.trim();
+      const chosenCat = newCat || document.getElementById('bmCategorySelect').value;
+      if (newCat && !state.catalogueCategories.includes(newCat)) state.catalogueCategories.push(newCat);
+      state.bookmarks.unshift({ id: 'bm' + Date.now(), serviceId: svc.id, name: svc.name, category: chosenCat, phone: svc.phone, url: svc.url, note: document.getElementById('bmNote').value.trim() });
+      saveState(); renderBookmarkedCatalogue(); document.getElementById('bookmarkModal').classList.add('hidden'); document.getElementById('bookmarkModal').classList.remove('flex'); showToast(`Bookmarked to "${chosenCat}"`);
+    });
+
+    document.getElementById('openAddCustomSupportBtn').addEventListener('click', () => { document.getElementById('customSupportModal').classList.remove('hidden'); document.getElementById('customSupportModal').classList.add('flex'); });
+    ['closeCustomSupportBtn', 'cancelCustomSupportBtn'].forEach(id => document.getElementById(id).addEventListener('click', () => { document.getElementById('customSupportModal').classList.add('hidden'); document.getElementById('customSupportModal').classList.remove('flex'); }));
+    document.getElementById('customSupportForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const cat = document.getElementById('csCategory').value;
+      state.bookmarks.unshift({ id: 'bm' + Date.now(), serviceId: 'custom', name: document.getElementById('csName').value.trim(), category: cat, phone: document.getElementById('csPhone').value.trim(), url: document.getElementById('csUrl').value.trim(), note: document.getElementById('csDesc').value.trim() });
+      e.target.reset(); saveState(); renderBookmarkedCatalogue(); document.getElementById('customSupportModal').classList.add('hidden'); document.getElementById('customSupportModal').classList.remove('flex'); showToast(`Saved to "${cat}"`);
+    });
+
+    function updateTimerDisplay() {
+      const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+      const secs = String(timerSeconds % 60).padStart(2, '0');
+      const disp = document.getElementById('seizureTimerDisplay'); disp.textContent = `${mins}:${secs}`;
+      if (timerSeconds >= 300) disp.classList.add('text-amber-300'); else disp.classList.remove('text-amber-300');
+    }
+    document.getElementById('timerStartBtn').addEventListener('click', () => { if (!timerInterval) timerInterval = setInterval(() => { timerSeconds++; updateTimerDisplay(); }, 1000); });
+    document.getElementById('timerStopBtn').addEventListener('click', () => { clearInterval(timerInterval); timerInterval = null; });
+    document.getElementById('timerResetBtn').addEventListener('click', () => { clearInterval(timerInterval); timerInterval = null; timerSeconds = 0; updateTimerDisplay(); });
+    document.getElementById('timerSaveBtn').addEventListener('click', () => {
+      const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+      const secs = String(timerSeconds % 60).padStart(2, '0');
+      document.getElementById('incTitle').value = `Timed Seizure / FND Episode (${mins}:${secs})`;
+      document.getElementById('incDate').value = new Date().toISOString().slice(0, 16);
+      document.getElementById('incDetails').value = `Timed episode duration: ${mins}:${secs}.`;
+      showToast('Timer copied into Incident form below');
+    });
+
+    document.getElementById('dirSearchInput').addEventListener('input', renderDirectory);
+    document.getElementById('dirCategoryFilters').addEventListener('click', e => { const btn = e.target.closest('button[data-cat]'); if (btn) { activeCategory = btn.dataset.cat; renderDirectory(); } });
+    document.getElementById('ddAgendaTextarea').addEventListener('input', e => { state.ddAgenda = e.target.value; saveState(); });
+    document.getElementById('copyDdAgendaBtn').addEventListener('click', () => copyText(state.ddAgenda, 'Coordination DD Brief copied'));
+    document.getElementById('copyFullBriefBtn').addEventListener('click', () => copyText(state.ddAgenda, 'Guardian Summary Brief copied'));
+    document.getElementById('addTaskForm').addEventListener('submit', e => { e.preventDefault(); const inp = document.getElementById('newTaskInput'); if (!inp.value.trim()) return; state.tasks.unshift({ id: 't' + Date.now(), text: inp.value.trim(), done: false }); inp.value = ''; saveState(); renderChecklist(); renderProfileAndKpis(); showToast('Urgent action added'); });
+    document.getElementById('incidentForm').addEventListener('submit', e => { e.preventDefault(); state.incidents.unshift({ id: 'inc' + Date.now(), title: document.getElementById('incTitle').value.trim(), type: document.getElementById('incType').value, severity: document.getElementById('incSeverity').value, date: document.getElementById('incDate').value, details: document.getElementById('incDetails').value.trim(), action: document.getElementById('incAction').value.trim(), resolved: false }); e.target.reset(); saveState(); renderIncidents(); renderProfileAndKpis(); showToast('Incident logged'); });
+    document.getElementById('resetMedsTodayBtn').addEventListener('click', () => { state.meds.forEach(m => m.done = false); saveState(); renderMedsAndAppointments(); showToast('Medication tracker reset'); });
+    document.getElementById('addApptForm').addEventListener('submit', e => { e.preventDefault(); state.appointments.push({ id: 'a' + Date.now(), title: document.getElementById('apptTitle').value.trim(), date: document.getElementById('apptDate').value, done: false }); e.target.reset(); saveState(); renderMedsAndAppointments(); showToast('Appointment added'); });
+
+    const installModal = document.getElementById('installModal');
+    document.getElementById('installAppBtn').addEventListener('click', () => { installModal.classList.remove('hidden'); installModal.classList.add('flex'); });
+    document.getElementById('closeInstallModalBtn').addEventListener('click', () => { installModal.classList.add('hidden'); installModal.classList.remove('flex'); });
+
+    const profileModal = document.getElementById('profileModal');
+    document.getElementById('editProfileBtn').addEventListener('click', () => {
+      document.getElementById('pfName').value = state.profile.name;
+      document.getElementById('pfNdis').value = state.profile.ndisNumber;
+      document.getElementById('pfReviewDate').value = state.profile.reviewDate;
+      document.getElementById('pfCoordinator').value = state.profile.coordinator;
+      document.getElementById('pfTrustee').value = state.profile.trusteeOfficer;
+      profileModal.classList.remove('hidden'); profileModal.classList.add('flex');
+    });
+    ['closeProfileModalBtn', 'cancelProfileModalBtn'].forEach(id => document.getElementById(id).addEventListener('click', () => { profileModal.classList.add('hidden'); profileModal.classList.remove('flex'); }));
+    document.getElementById('profileForm').addEventListener('submit', e => {
+      e.preventDefault();
+      state.profile.name = document.getElementById('pfName').value.trim() || 'Mum — Care File';
+      state.profile.ndisNumber = document.getElementById('pfNdis').value.trim() || 'Pending';
+      state.profile.reviewDate = document.getElementById('pfReviewDate').value;
+      state.profile.coordinator = document.getElementById('pfCoordinator').value.trim();
+      state.profile.trusteeOfficer = document.getElementById('pfTrustee').value.trim();
+      saveState(); renderProfileAndKpis(); profileModal.classList.add('hidden'); profileModal.classList.remove('flex'); showToast('Profile updated');
+    });
+
+    const providerModal = document.getElementById('providerModal');
+    document.getElementById('openAddProviderModalBtn').addEventListener('click', () => { providerModal.classList.remove('hidden'); providerModal.classList.add('flex'); });
+    ['closeProviderModalBtn', 'cancelProviderModalBtn'].forEach(id => document.getElementById(id).addEventListener('click', () => { providerModal.classList.add('hidden'); providerModal.classList.remove('flex'); }));
+    document.getElementById('providerForm').addEventListener('submit', e => {
+      e.preventDefault();
+      state.careTeam.unshift({ id: 'p' + Date.now(), name: document.getElementById('prName').value.trim(), role: document.getElementById('prRole').value.trim(), phone: document.getElementById('prPhone').value.trim(), email: document.getElementById('prEmail').value.trim(), url: document.getElementById('prUrl').value.trim(), status: document.getElementById('prStatus').value });
+      e.target.reset(); saveState(); renderCareTeam(); providerModal.classList.add('hidden'); providerModal.classList.remove('flex'); showToast('Provider added');
+    });
+
+    const logModal = document.getElementById('logModal');
+    ['closeLogModalBtn', 'cancelLogModalBtn'].forEach(id => document.getElementById(id).addEventListener('click', () => { logModal.classList.add('hidden'); logModal.classList.remove('flex'); }));
+    document.getElementById('logInteractionForm').addEventListener('submit', e => {
+      e.preventDefault();
+      state.interactions.unshift({ id: 'i' + Date.now(), provider: document.getElementById('logProviderName').value, channel: document.getElementById('logChannel').value, date: new Date().toISOString().slice(0, 10), summary: document.getElementById('logSummary').value.trim() });
+      e.target.reset(); saveState(); renderCareTeam(); logModal.classList.add('hidden'); logModal.classList.remove('flex'); showToast('Interaction logged');
+    });
+
+    document.getElementById('exportJsonBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'careguard_ndis_crm_backup.json'; a.click(); showToast('Backup JSON downloaded');
+    });
+    document.getElementById('importJsonInput').addEventListener('change', e => {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (parsed && parsed.profile && parsed.categories) { state = parsed; saveState(); renderAll(); showToast('Backup restored'); }
+        } catch (err) { showToast('Invalid JSON backup file'); }
+      };
+      reader.readAsText(file);
+    });
+
+    window.addEventListener('DOMContentLoaded', renderAll);
+  </script>
+</body>
+</html>
